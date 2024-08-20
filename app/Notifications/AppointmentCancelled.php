@@ -43,7 +43,7 @@ class AppointmentCancelled extends Notification
 
     private function formatNote($appointment)
     {
-        return $appointment->comment ?? null;
+        return $appointment->remark ?? null;
     }
 
     private function formatDate($appointment)
@@ -58,19 +58,12 @@ class AppointmentCancelled extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $fullName = $this->getFullName($notifiable->toArray());
-        $reason = $this->formatNote($this->appointment);
-        $appointmentDate = $this->formatDate($this->appointment);
-
         return (new MailMessage)
-            ->greeting('Hello ' . $fullName . '!')
-            ->line('We hope this message finds you well.')
-            ->line('We regret to inform you that your upcoming dental appointment scheduled for ' . $appointmentDate . ' has been cancelled.')
-            ->line('**Reason for cancellation:**')
-            ->line('**' . $reason . '**')
-            ->line('We apologize for any inconvenience this may cause. Please feel free to contact us to reschedule your appointment at a convenient time.')
-            ->line('Your dental health is our top priority, and we are committed to providing you with the best possible care.')
-            ->line('Thank you for your understanding.');
+            ->subject('Dental Appointment Cancelled')
+            ->markdown('emails.appointment_canceled', [
+                'appointment' => $this->appointment,
+                'notifiable' => $notifiable
+            ]);
     }
 
     /**

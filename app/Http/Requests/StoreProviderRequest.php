@@ -29,7 +29,6 @@ class StoreProviderRequest extends FormRequest
             'first_name' => ['string', 'required', 'max:255'],
             'middle_name' => ['max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'specialization' => ['required', 'max:255'],
             'province' => ['required', 'string', 'max:255'],
             'city' => ['required', 'string', 'max:255'],
             'barangay' => ['required', 'string', 'max:255'],

@@ -24,7 +24,7 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        $provinces = Province::all();
+        $provinces = json_decode(file_get_contents(config_path('province.json')), true);
         return view('auth.register', compact('provinces'));
     }
 
@@ -35,11 +35,30 @@ class RegisteredUserController extends Controller
      */
     public function store(RegisteredUserRequest $request): RedirectResponse
     {
+        // Fetch barangay name from 'barangay.json'
+        $barangayName = collect(json_decode(file_get_contents(config_path('barangay.json')), true))
+            ->where('brgy_code', $request->barangay)
+            ->pluck('brgy_name')
+            ->first();
+
+        // Fetch city name from 'cities.json'
+        $cityName = collect(json_decode(file_get_contents(config_path('cities.json')), true))
+            ->where('city_code', $request->city)
+            ->pluck('city_name')
+            ->first();
+
+        // Fetch province name from 'province.json'
+        $provinceName = collect(json_decode(file_get_contents(config_path('province.json')), true))
+            ->where('province_code', $request->province)
+            ->pluck('province_name')
+            ->first();
+
         $locationDetails = [
-            'barangay' => Barangay::where('brgy_code', $request->barangay)->value('brgy_name'),
-            'city' => City::where('city_code', $request->city)->value('city_name'),
-            'province' => Province::where('province_code', $request->province)->value('province_name')
+            'barangay' => $barangayName,
+            'city' => $cityName,
+            'province' => $provinceName
         ];
+
 
         if (in_array(null, $locationDetails, true)) {
             return response()->json(['error' => 'Invalid location details provided.'], 400);

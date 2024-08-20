@@ -15,6 +15,8 @@ use App\Http\Controllers\Controller;
 use App\Notifications\AppointmentBooked;
 use App\Http\Requests\AppointmentRequest;
 use App\Http\Requests\AppointmentUpdateStatusRequest;
+use App\Models\AppointmentHistory;
+use App\Models\CanceledAppointment;
 use App\Repository\AppointmentRepository;
 use App\Notifications\AppointmentCancelled;
 use App\Notifications\AppointmentCompleted;
@@ -40,7 +42,7 @@ class AppointmentController extends Controller
     {
         // return all appointment with CANCELLED and COMPLETED status
         $rawAppointments = $this->appointmentRepository->showHistory();
-
+        // dd($rawAppointments);
         $userType = auth()->user()->userType;
 
         $view = match ($userType) {
@@ -61,6 +63,7 @@ class AppointmentController extends Controller
 
     public function show($appointment)
     {
+
         $appointment = Appointment::findOrFail($appointment);
         $service = Service::where('id', $appointment->service_id)->firstOrFail();
         $user = auth()->user();
@@ -118,10 +121,8 @@ class AppointmentController extends Controller
         $data = $request->merge(['user_id' => auth()->id()])->toArray();
         unset($data['service_name']);
         $appointment = Appointment::create($data);
-
-        // Dispatch the notification
-        // Notification::route('mail', config('mail.from.address'))
-        //     ->notify(new AppointmentBooked($data));
+        $admin = User::where('userType', 'admin')->get();
+        // Notification::send($admin, new AppointmentBooked($data));
 
         if (!$appointment) {
             emotify('error', 'Failed to book appointment');
@@ -131,17 +132,24 @@ class AppointmentController extends Controller
         return redirect()->route('user.appointments', auth()->user()->id);
     }
 
-    public function edit(Appointment $appointment)
+    public function edit($appointment)
     {
-        $service = Service::findOrFail($appointment->service_id);
-        $user = User::findOrFail($appointment->user_id);
-        $patient = Patient::where('user_id', $appointment->user_id)->firstOrFail();
+        if (AppointmentHistory::where('id', $appointment)->get()->toArray()) {
+            $appointmentDetails = AppointmentHistory::findOrFail($appointment);
+        } elseif (Appointment::where('id', $appointment)->get()->toArray()) {
+            $appointmentDetails = Appointment::findOrFail($appointment);
+        } else {
+            abort(404, 'Appoitment Not Found');
+        }
+        $service = Service::findOrFail($appointmentDetails->service_id);
+        $user = User::findOrFail($appointmentDetails->user_id);
+        $patient = Patient::where('user_id', $appointmentDetails->user_id)->firstOrFail();
 
         $appointmentInfo = [
             'service' => $service,
             'user' => $user,
             'patient' => $patient,
-            'appointment' => $appointment
+            'appointment' => $appointmentDetails
         ];
 
         $userType = auth()->user()->userType;
@@ -160,12 +168,16 @@ class AppointmentController extends Controller
         $user = User::findOrFail($appointmentToUpdate->user_id);
 
         $appointment = $appointmentToUpdate->update($request->validated());
-
+        $appointmentToUpdate->refresh(); // Reload the model from the database
+        $updatedAppointment = $appointmentToUpdate;
         if ($appointmentToUpdate->status == 'cancelled') {
-            // $user->notify(new AppointmentCancelled($appointmentToUpdate));
+            AppointmentHistory::create($updatedAppointment->toArray());
+            // $user->notify(new AppointmentCancelled($updatedAppointment));
         } else if ($appointmentToUpdate->status == 'completed') {
-            // $user->notify(new AppointmentCompleted($appointmentToUpdate));
+            AppointmentHistory::create($updatedAppointment->toArray());
+            // $user->notify(new AppointmentCompleted($updatedAppointment));
         }
+        $updatedAppointment->delete();
 
         $userType = auth()->user()->userType;
 
@@ -176,10 +188,10 @@ class AppointmentController extends Controller
 
         if (!$appointment) {
             emotify('error', 'Failed to update appointment status');
-            return redirect()->route($route);
+            return redirect()->back();
         }
         emotify('success', 'Appointment status updated successfully');
-        return redirect()->route($route);
+        return redirect()->back();
     }
 
     // user cancel their appointment

@@ -87,18 +87,6 @@ class ServiceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Service $service)
-    {
-        $service = $this->serviceModel->deleteService($service);
-
-        if (!$service) {
-            emotify('error', 'Failed to delete service');
-            return redirect()->route('services.index');
-        }
-
-        emotify('success', 'Service has been deleted');
-        return redirect()->route('services.index');
-    }
 
     public function search(Request $request)
     {
@@ -133,15 +121,7 @@ class ServiceController extends Controller
 												<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
 											</svg>
 											<span class="hidden md:block">Edit</span></a>
-                    <form action="' . route('services.destroy', ['service' => $service->id]) . '" method="post" onsubmit="return confirm(\'Are you sure you want to delete ' . htmlspecialchars($service->name) . ' service?\')">
-                        ' . csrf_field() . '
-                        ' . method_field('DELETE') . '
-                        <button class="font-medium text-white bg-red-600 px-2 py-1 rounded hover:bg-red-700 flex items-center justify-center gap-1 w-fit" type="submit"><svg fill="none" height="15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-													stroke="currentColor" viewBox="0 0 24 24" width="15" xmlns="http://www.w3.org/2000/svg">
-													<path d="M3 6h18"></path>
-													<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-												</svg><span class="hidden md:block">Delete</span></button>
-                    </form>
+
                 </td>
             </tr>';
         }

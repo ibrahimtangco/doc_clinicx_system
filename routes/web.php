@@ -1,9 +1,13 @@
 <?php
 
 
+use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Appointment;
 use Illuminate\Support\Facades\Route;
 use Spatie\Activitylog\Models\Activity;
 use App\Http\Controllers\PrintController;
+use App\Notifications\AppointmentReminder;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
@@ -11,6 +15,7 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\BarangayController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProviderController;
+use Illuminate\Support\Facades\Notification;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\BusinessHourController;
@@ -91,7 +96,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('admin/service/search', [ServiceController::class, 'search']);
 
     Route::resource('admin/patients', PatientController::class);
-    Route::get('admin/patient/search', [PatientController::class, 'search']);
+    Route::get('admin/patient/search', [PatientController::class, 'search'])->name('admin.search.patient');
 
     Route::get('admin/patients/record/{patient}', [MedicalHistoryController::class, 'show'])->name('show.patient.record');
     Route::get('admin/business-hours', [BusinessHourController::class, 'index'])->name('admin.business_hours');
@@ -113,9 +118,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('admin/patients/api/fetch-city', [RegisteredUserController::class, 'fetchCity']);
     Route::post('admin/patients/api/fetch-barangay', [RegisteredUserController::class, 'fetchBarangay']);
 
-    // Medical History
-    Route::post('admin/add-medical-history', [MedicalHistoryController::class, 'store'])->name('add.medical.history');
-    Route::put('admin/edit-medical-history/{patient}', [MedicalHistoryController::class, 'update'])->name('edit.medical.history');
 
     Route::resource('admin/products', ProductController::class);
     Route::get('admin/product/search', [ProductController::class, 'search']);
@@ -146,10 +148,42 @@ Route::middleware(['auth', 'role:SuperAdmin'])->group(function () {
     Route::post('superadmin/edit-appointment/{appointment}', [AppointmentController::class, 'update']);
     Route::get('superadmin/prescriptions/{patient}/create', [PrescriptionController::class, 'create'])->name('create.prescription');
     Route::resource('superadmin/prescriptions', PrescriptionController::class)->names('superadmin.prescriptions');
+    Route::get('superadmin/patient/search', [PatientController::class, 'search'])->name('superadmin.search.patient');
+    Route::resource('superadmin/patients', PatientController::class)->names([
+        'index' => 'superadmin.patients.index',
+        'create' => 'superadmin.patients.create',
+        'store' => 'superadmin.patients.store',
+        'show' => 'superadmin.patients.show',
+        'edit' => 'superadmin.patients.edit',
+        'update' => 'superadmin.patients.update',
+        'destroy' => 'superadmin.patients.destroy',
+    ]);
+    Route::post('superadmin/add-medical-history', [MedicalHistoryController::class, 'store'])->name('add.medical.history');
+    Route::put('superadmin/edit-medical-history/{patient}', [MedicalHistoryController::class, 'update'])->name('edit.medical.history');
+
+    Route::get('superadmin/patients/record/{patient}', [MedicalHistoryController::class, 'show'])->name('superadmin.show.patient.record');
+    Route::get('superadmin/product/search', [ProductController::class, 'search']);
     Route::get('superadmin/download-pdf/{prescription}', [PrintController::class, 'downloadPDF'])->name('superadmin.prescriptions.downloadPDF');
     Route::get('superadmin/preview-pdf/{prescription}', [PrintController::class, 'previewPDF'])->name('superadmin.prescriptions.previewPDF');
 });
 
+
+Route::get('/test-notif', function () {
+    $appointments = Appointment::whereDate('date', Carbon::tomorrow())->get();
+
+    $users = [];
+
+    foreach ($appointments as $appointment) {
+        $user = User::find($appointment->user_id);
+        if ($user) {
+            // Add the user to the array if they are not already in it
+            $users[$user->id] = $user;
+
+            // Send the reminder to the individual user
+            Notification::send($user, new AppointmentReminder($appointment));
+        }
+    }
+});
 
 
 

@@ -35,19 +35,8 @@
 		<x-input-error :messages="$errors->get('last_name')" class="mt-2" />
 	</div>
 </div>
-@if (request()->routeIs('providers.create'))
-	<div class="w-full">
-		<x-input-label :value="__('Specialization')" for="specialization" />
-		<select autocomplete="specialization"
-			class="w-full mt-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-			id="specialization" name="specialization">
-			<option value="General Dentist">General Dentist</option>
-		</select>
-	</div>
-	<input name="userType" type="hidden" value="SuperAdmin">
-@endif
 
-@if (request()->routeIs('register') || request()->routeIs('patients.create'))
+@if (request()->routeIs('register') || request()->routeIs('patients.create') || request()->routeIs('superadmin.patients.create'))
 	<div class="md:flex space-y-2 items-center justify-between gap-4 md:space-y-0 mt-4">
 		<div class="w-full">
 			<x-input-label :value="__('Birthday')" for="birthday" />
@@ -72,7 +61,7 @@
 			name="province">
 			<option value="">--Select Province--</option>
 			@foreach ($provinces as $province)
-				<option value="{{ $province->province_code }}">{{ $province->province_name }}</option>
+				<option value="{{ $province['province_code'] }}">{{ $province['province_name'] }}</option>
 			@endforeach
 		</select>
 		<x-input-error :messages="$errors->get('province')" class="mt-2" />

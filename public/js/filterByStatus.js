@@ -65,7 +65,9 @@ $(document).ready(function() {
 							statusText =
 								status; // Display status as it is if not matched with any condition
 						}
-
+                        console.log(window.userRole);
+                        var role = window.userRole.toLowerCase();
+                        var baseURL = `${window.location.origin}/${role}/edit-appointment/${appointment.id}`;
 						var statusSpan = '<span class="' + statusClass +
 							' px-2 py-0.5 rounded-full">' + statusText + '</span>';
 						var row = `
@@ -74,7 +76,7 @@ $(document).ready(function() {
 							${appointment.user.first_name} ${middleInitial} ${appointment.user.last_name }
 						</th>
 						<td class="px-6 py-4">
-                            ${appointment.service.name} a
+                            ${appointment.service.name}
 						</td>
 						<td class="px-6 py-4">
 							${formattedDate}
@@ -88,7 +90,7 @@ $(document).ready(function() {
 						<td class="px-6 py-4 flex flex-col gap-1 xl:block xl:space-x-1">
 							<a
 								class="font-medium text-center text-white hover:bg-blue-700 bg-blue-600 px-2 py-1 rounded flex items-center justify-center gap-1 w-fit"
-								href="${window.location.origin}/admin/edit-appointment/${appointment.id}">
+								href="${baseURL}">
 								<svg width="15" height="15" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>

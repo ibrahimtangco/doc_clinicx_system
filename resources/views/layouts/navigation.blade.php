@@ -18,7 +18,7 @@
 				<x-dropdown align="right" width="48">
 					<x-slot name="trigger">
 						<button
-							class="inline-flex gap-2 items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
+							class="inline-flex gap-2 items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
 							<div class="flex flex-col items-end gap-1">
 								{{ auth()->user()->full_name }}
 							</div>
@@ -37,6 +37,9 @@
 						@if (auth()->user()->userType == 'SuperAdmin')
 							<x-dropdown-link :href="route('superadmin.profile.edit')">
 								{{ __('Profile') }}
+							</x-dropdown-link>
+                            <x-dropdown-link :href="route('superadmin.patients.index')">
+								{{ __('View Patients') }}
 							</x-dropdown-link>
                             <x-dropdown-link :href="route('superadmin.prescriptions.index')">
 								{{ __('View Prescriptions') }}
@@ -97,6 +100,9 @@
 				@if (auth()->user()->userType == 'SuperAdmin')
 					<x-responsive-nav-link :href="route('superadmin.profile.edit')">
 						{{ __('Profile') }}
+					</x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('superadmin.patients.index')">
+						{{ __('View Patients') }}
 					</x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('superadmin.prescriptions.index')">
 						{{ __('View Prescriptions') }}

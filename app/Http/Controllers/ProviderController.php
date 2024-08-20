@@ -42,7 +42,7 @@ class ProviderController extends Controller
      */
     public function create()
     {
-        $provinces = Province::all();
+        $provinces = json_decode(file_get_contents(config_path('province.json')), true);
         return view('admin.providers.create', compact('provinces'));
     }
 
@@ -53,18 +53,43 @@ class ProviderController extends Controller
     {
         $validated = $request->validated();
 
-        $barangay = Barangay::where('brgy_code', $validated['barangay'])->value('brgy_name');
+        // Fetch barangay name
+        $barangayData = json_decode(file_get_contents(config_path('barangay.json')), true);
+        $barangayCode = $validated['barangay'];
+        $barangay = null;
+        foreach ($barangayData as $item) {
+            if ($item['brgy_code'] === $barangayCode) {
+                $barangay = $item;
+                break;
+            }
+        }
 
-        $city = City::where('city_code', $validated->city)->value('city_name');
-        $province = Province::where(
-            'province_code',
-            $validated->province
-        )->value('province_name');
-        $street = $validated->street;
+        // Fetch city name
+        $citiesData = json_decode(file_get_contents(config_path('cities.json')), true);
+        $cityCode = $validated['city'];
+        $city = null;
+        foreach ($citiesData as $item) {
+            if ($item['city_code'] === $cityCode) {
+                $city = $item;
+                break;
+            }
+        }
+
+        // Fetch province name
+        $provinceData = json_decode(file_get_contents(config_path('province.json')), true);
+        $provinceCode = $validated['province'];
+        $province = null;
+        foreach ($provinceData as $item) {
+            if ($item['province_code'] === $provinceCode) {
+                $province = $item;
+                break;
+            }
+        }
+        $street = $validated['street'];
         if ($street) {
-            $address = $street . ', ' . $barangay . ', ' . $city . ', ' . $province;
+            $address = $street . ', ' . $barangay['brgy_name'] . ', ' . $city['city_name'] . ', ' . $province['province_name'];
         } else {
-            $address = $barangay . ', ' . $city . ', ' . $province;
+            $address = $barangay['brgy_name'] . ', ' . $city['city_name'] . ', ' . $province['province_name'];
         }
 
         DB::transaction(function () use ($validated, $address) {
@@ -93,17 +118,37 @@ class ProviderController extends Controller
         $currentAddress = $user->user->address;
         $modifiedAddress = $this->addressService->getAddress($currentAddress);
 
-        $provinces = Cache::remember('provinces', 60 * 60, function () {
-            return Province::pluck('province_name', 'province_code')->toArray();
-        });
+        // Helper function to fetch data from JSON file and cache it
+        function getCachedData($cacheKey, $jsonFile, $codeKey, $nameKey, $whereClause = null)
+        {
+            return Cache::remember($cacheKey, 60 * 60, function () use ($jsonFile, $codeKey, $nameKey, $whereClause) {
+                $jsonData = json_decode(file_get_contents(config_path($jsonFile)), true);
 
-        $cities = Cache::remember("cities_{$modifiedAddress['province_code']}", 60 * 60, function () use ($modifiedAddress) {
-            return City::where('province_code', $modifiedAddress['province_code'])->pluck('city_name', 'city_code')->toArray();
-        });
+                if (isset($whereClause['province_code'])) {
+                    // Filter data based on whereClause
+                    $filteredData = collect($jsonData)->where('province_code', $whereClause['province_code'])->pluck($nameKey, $codeKey)->toArray();
+                    return $filteredData;
+                } elseif (isset($whereClause['city_code'])) {
+                    // Filter data based on whereClause
+                    $filteredData = collect($jsonData)->where('city_code', $whereClause['city_code'])->pluck($nameKey, $codeKey)->toArray();
+                    return $filteredData;
+                }
 
-        $barangays = Cache::remember("barangays_{$modifiedAddress['city_code']}", 60 * 60, function () use ($modifiedAddress) {
-            return Barangay::where('city_code', $modifiedAddress['city_code'])->pluck('brgy_name', 'brgy_code')->toArray();
-        });
+                // Return all data if no whereClause is provided
+                return collect($jsonData)->pluck($nameKey, $codeKey)->toArray();
+            });
+        }
+
+
+        // Usage in your code
+        // Fetch provinces
+        $provinces = getCachedData('provinces', 'province.json', 'province_code', 'province_name');
+
+        // Fetch cities based on province_code
+        $cities = getCachedData("cities_{$modifiedAddress['province_code']}", 'cities.json', 'city_code', 'city_name', ['province_code' => $modifiedAddress['province_code']]);
+
+        // Fetch barangays based on city_code
+        $barangays = getCachedData("barangays_{$modifiedAddress['city_code']}", 'barangay.json', 'brgy_code', 'brgy_name', ['city_code' => $modifiedAddress['city_code']]);
 
 
         return view('admin.providers.edit', compact('user', 'provinces', 'cities', 'barangays', 'modifiedAddress'));
@@ -116,19 +161,31 @@ class ProviderController extends Controller
     {
         $validated = $request->validated();
 
-        $barangay = Barangay::where('brgy_code', $request->barangay)->value('brgy_name');
-        $city = City::where('city_code', $request->city)->value('city_name');
-        $province = Province::where(
-            'province_code',
-            $request->province
-        )->value('province_name');
-        $street = $request->street;
+        // Fetch barangay name from 'barangay.json'
+        $barangay = collect(json_decode(file_get_contents(config_path('barangay.json')), true))
+            ->where('brgy_code', $validated['barangay'])
+            ->pluck('brgy_name')
+            ->first();
+
+        // Fetch city name from 'cities.json'
+        $city = collect(json_decode(file_get_contents(config_path('cities.json')), true))
+            ->where('city_code', $validated['city'])
+            ->pluck('city_name')
+            ->first();
+
+        // Fetch province name from 'province.json'
+        $province = collect(json_decode(file_get_contents(config_path('province.json')), true))
+            ->where('province_code', $validated['province'])
+            ->pluck('province_name')
+            ->first();
+
+        $street = $validated['street'];
+
         if ($street) {
             $address = $street . ', ' . $barangay . ', ' . $city . ', ' . $province;
         } else {
             $address = $barangay . ', ' . $city . ', ' . $province;
         }
-
         DB::transaction(function () use ($validated, $address, $provider) {
             $this->userModel->updateUserDetails($validated, $address, $provider->user_id);
             $this->providerModel->updateProviderDetails($validated, $provider->id);
@@ -192,7 +249,6 @@ class ProviderController extends Controller
                 ->orWhereRaw("CONCAT(title, ' ', first_name, ' ', middle_name, ' ', last_name) LIKE ?", ['%' . $search . '%'])
                 ->orWhere('email', 'LIKE', '%' . $search . '%');
         })
-            ->orWhere('specialization', 'LIKE', '%' . $search . '%')
             ->get();
 
 
@@ -211,7 +267,6 @@ class ProviderController extends Controller
                 ' . $provider->user->last_name . '
             </a>
         </td>
-        <td class="px-6 py-4">' . $provider->specialization . '</td>
         <td class="px-6 py-4">' . $provider->user->email . '</td>
         <td class="px-6 py-4 text-right space-x-2 flex items-center">
             <a class="font-medium text-white bg-blue-600 px-2 py-1 rounded hover:bg-blue-700 flex items-center justify-center gap-1 w-fit"

@@ -4,13 +4,14 @@ namespace App\Repository;
 
 use Carbon\Carbon;
 use App\Models\Appointment;
+use App\Models\AppointmentHistory;
 
 class AppointmentRepository
 {
 
     public function showHistory()
     {
-        return Appointment::where('status', '!=', 'booked')->orderBy('date')->orderBy('time')->paginate(10);
+        return AppointmentHistory::orderBy('date')->orderBy('time')->paginate(10);
     }
 
     public function showUserAppointments($user_id)

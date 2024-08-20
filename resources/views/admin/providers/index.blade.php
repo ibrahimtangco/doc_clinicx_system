@@ -39,7 +39,6 @@
 						<thead class="text-xs text-gray-700 uppercase bg-gray-50">
 							<tr>
 								<th class="px-6 py-3" scope="col">Name</th>
-								<th class="px-6 py-3 " scope="col">Specialization</th>
 								<th class="px-6 py-3 " scope="col">Email</th>
 								<th class="px-6 py-3" scope="col"><span class="sr-only">Action</span></th>
 							</tr>
@@ -58,7 +57,6 @@
 											{{ $provider->user->last_name }}
 										</a>
 									</td>
-									<td class="px-6 py-4 ">{{ $provider->specialization }}</td>
 									<td class="px-6 py-4 ">{{ $provider->user->email }}</td>
 									<td class="px-6 py-4 text-right space-x-2 flex items-center">
 										<a

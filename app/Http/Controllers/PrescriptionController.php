@@ -16,7 +16,7 @@ class PrescriptionController extends Controller
      */
     public function index()
     {
-        $prescriptions = Prescription::with('patient.user')->get();
+        $prescriptions = Prescription::orderBy('created_at', 'desc')->get();
 
         $userType = auth()->user()->userType;
 

@@ -2,10 +2,13 @@
 
 namespace App\Notifications;
 
+use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Service;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
 class AppointmentBooked extends Notification
 {
@@ -35,14 +38,18 @@ class AppointmentBooked extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
+        $service = Service::findOrFail($this->data['service_id']);
+        $formattedDate = Carbon::parse($this->data['date'])->format('F j, Y');
+        $formattedTime = Carbon::parse($this->data['time'])->format('g:i A');
 
         return (new MailMessage)
-            ->greeting("Hello")
-            ->line('A new appointment has been booked on')
-            ->line("Date: {$this->data['date']}")
-            ->line("Time: {$this->data['time']}")
-            ->action('View Appointments', route('admin.appointments.view'))
-            ->line('Thank you for using our application!');
+            ->subject('New Dental Appointment Booked')
+            ->markdown('emails.appointment_booked', [
+                'service' => $service,
+                'formattedDate' => $formattedDate,
+                'formattedTime' => $formattedTime,
+                'patient' => $notifiable
+            ]);
     }
 
     /**

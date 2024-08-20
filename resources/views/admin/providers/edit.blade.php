@@ -26,16 +26,6 @@
 							@csrf
 							@method('PUT')
 
-							{{-- <div>
-								<img alt="" class="w-12 h-12 rounded-full object-cover mb-4 border-2 border-gray-400"
-									src="{{ asset($provider->avatar) }}">
-								<x-input-label :value="__('Avatar')" for="avatar" />
-								<div class="border border-gray-300 p-1 mt-1 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-									<x-text-input autocomplete="avatar" autofocus class="rounded-none block w-full shadow-none border-0"
-										id="avatar" name="avatar" type="file" />
-								</div>
-								<x-input-error :messages="$errors->get('title')" class="mt-2" />
-							</div> --}}
 							<x-form-edit :barangays="$barangays" :cities="$cities" :modifiedAddress="$modifiedAddress" :provinces="$provinces" :user="$user" />
 
 							<div class="flex items-center gap-4">

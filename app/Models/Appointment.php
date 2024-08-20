@@ -17,6 +17,7 @@ class Appointment extends Model
     protected $guarded = [];
 
     //* RELATIONSHIPS
+
     // user and appointmetn relationship
     public function user()
     {

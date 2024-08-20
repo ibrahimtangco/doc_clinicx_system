@@ -24,3 +24,6 @@
 	</form>
 </section>
 <script src="{{ asset('js/edit_profile_address_handler.js') }}"></script>
+@if (request()->routeIs('profile.edit'))
+    <script src="{{ asset('js/autofill_age.js') }}"></script>
+@endif

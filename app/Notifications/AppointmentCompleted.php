@@ -33,15 +33,6 @@ class AppointmentCompleted extends Notification
     /**
      * Get the mail representation of the notification.
      */
-    private function getFullName($patient)
-    {
-        if ($patient['middle_name']) {
-            $middleInitial = Str::ucfirst(substr($patient['middle_name'], 0, 1));
-            return $patient['first_name'] . ' ' . $middleInitial . '. ' . $patient['last_name'];
-        } else {
-            return $patient['first_name'] . ' ' . $patient['last_name'];
-        }
-    }
 
     private function formatNote($appointment)
     {
@@ -50,18 +41,12 @@ class AppointmentCompleted extends Notification
 
     public function toMail(object $notifiable)
     {
-        $fullName = $this->getFullName($notifiable->toArray());
-        $comment = $this->formatNote($this->appointment);
-
         return (new MailMessage)
-            ->greeting('Hello ' . $fullName . '!')
-            ->line('We hope this message finds you well.')
-            ->line('We are pleased to inform you that your recent dental appointment has been successfully completed.')
-            ->line('Here is a comment from your dentist about the consultation:')
-            ->line('**"' . $comment . '"**')
-            ->line('Your dental health is our top priority, and we are glad to have been able to assist you.')
-            ->line('Thank you for choosing our clinic. We look forward to seeing you at your next visit.')
-            ->line('If you have any further questions or need additional support, please don’t hesitate to contact us.');
+            ->subject('Appointment Completed')
+            ->markdown('emails.appointment_completed', [
+                'notifiable' => $notifiable,
+                'appointment' => $this->appointment
+            ]);
     }
 
     /**

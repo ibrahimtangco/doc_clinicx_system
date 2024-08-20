@@ -14,7 +14,6 @@ class Provider extends Model
         'avatar',
         'user_id',
         'title',
-        'specialization',
     ];
 
     public function user()
@@ -28,7 +27,6 @@ class Provider extends Model
             Provider::create([
                 'user_id' => $user_id,
                 'title' => $validated['title'],
-                'specialization' => $validated['specialization']
             ]);
     }
 
@@ -38,7 +36,6 @@ class Provider extends Model
 
         return $providerToUpdate->update([
             'title' => $validated['title'],
-            'specialization' => $validated['specialization']
         ]);
     }
 }

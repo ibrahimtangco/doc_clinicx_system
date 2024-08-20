@@ -40,9 +40,11 @@
 						<option class="text-red-500" value="cancelled">Show Cancelled</option>
 					</select>
 				</div>
-                @if (request()->routeIs('superadmin.appointments.history'))
-                <a href="{{ route('superadmin.appointments.view') }}" class="px-4 py-2 bg-primary border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-background-hover focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">View Appointments</a>
-            @endif
+				@if (request()->routeIs('superadmin.appointments.history'))
+					<a
+						class="px-4 py-2 bg-primary border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-background-hover focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
+						href="{{ route('superadmin.appointments.view') }}">View Appointments</a>
+				@endif
 			</div>
 		</div>
 		<table class="w-full text-sm text-left rtl:text-right text-secondary-text mt-4 mb-8">
@@ -114,6 +116,8 @@
 		<div class="mt-4">
 			{{ $appointments->links('pagination::tailwind') }}
 		</div>
-
+		<script>
+			window.userRole = @json(auth()->user()->userType);
+		</script>
 		<script src="{{ asset('js/filterByStatus.js') }}"></script>
 </x-app-layout>

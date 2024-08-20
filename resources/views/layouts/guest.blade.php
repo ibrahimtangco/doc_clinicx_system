@@ -1,5 +1,4 @@
-@include('layouts.header')
-
+<x-master-layout>
         <div class="bg-white min-h-screen sm:flex flex-col justify-center items-center md:pt-6 sm:pt-0 sm:bg-gray-100 mt-8 sm:mt-0">
             <div class="flex items-center justify-center -ml-6">
                 <a href="/" class="flex items-center">
@@ -9,7 +8,8 @@
             </div>
 
             <div class="w-full flex items-center justify-center">
-                {{ $slot }}
+                    {{ $slot }}
             </div>
         </div>
-@include('layouts.footer')
+</x-master-layout>
+

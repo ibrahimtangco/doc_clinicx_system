@@ -73,7 +73,7 @@
 				13C8.685 13 6 10.310 6 7C6 3.685 8.685 1 12 1C10.310 1 18 3.685 18 7C18 10.310 10.310 13 12 13Z">
 						</path>
 					</svg>
-					<span>Providers</span>
+					<span>Dentists</span>
 				</div>
 				{{-- arrow --}}
 				<svg fill="currentColor" height="20px" id="Layer_1" style="enable-background:new 0 0 512 512;" version="1.1"
@@ -95,7 +95,7 @@
 						<path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" />
 					</svg>
 
-					<span>View Providers</span>
+					<span>View Dentists</span>
 				</a>
 				<a
 					class="flex w-full items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('providers.create') ? 'bg-white/10' : '' }}"
@@ -106,7 +106,7 @@
 						<path
 							d="M417.4,224H288V94.6c0-16.9-14.3-30.6-32-30.6c-17.7,0-32,13.7-32,30.6V224H94.6C77.7,224,64,238.3,64,256  c0,17.7,13.7,32,30.6,32H224v129.4c0,16.9,14.3,30.6,32,30.6c17.7,0,32-13.7,32-30.6V288h129.4c16.9,0,30.6-14.3,30.6-32  C448,238.3,434.3,224,417.4,224z" />
 					</svg>
-					<span>Add Provider</span>
+					<span>Add Dentist</span>
 				</a>
 			</div>
 		</li>
@@ -144,7 +144,7 @@
 						<path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" />
 					</svg>
 
-					<span>View Service</span>
+					<span>View Services</span>
 				</a>
 				<a class="flex w-full items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200"
 					href="{{ route('services.create') }}">
@@ -176,7 +176,7 @@
 					version="1.1" viewBox="0 0 512 512" width="20px" xml:space="preserve"
 					xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
 					<path
-						x-bind:d="isOpenProcedure ?
+						x-bind:d="isOpenPatient ?
 						    'M413.1,327.3l-1.8-2.1l-136-106.5c-4.6-5.3-11.5-8.6-19.2-8.6c-7.7,0-14.6,3.4-19.2,8.6L101,324.9l-2.3,2.6  C97,330,96,333,96,336.2c0,8.7,7.4,10.8,16.6,10.8v0h286.8v0c9.2,0,16.6-7.1,16.6-10.8C416,332.9,414.9,329.8,413.1,327.3z' :
 						    'M98.9,184.7l1.8,2.1l136,106.5c4.6,5.3,11.5,8.6,19.2,8.6c7.7,0,14.6-3.4,19.2-8.6L411,187.1l2.3-2.6  c1.7-2.5,2.7-5.5,2.7-8.7c0-8.7-7.4-10.8-16.6-10.8v0H112.6v0c-9.2,0-16.6,7.1-16.6,10.8C96,179.1,97.1,182.2,98.9,184.7z'" />
 				</svg>

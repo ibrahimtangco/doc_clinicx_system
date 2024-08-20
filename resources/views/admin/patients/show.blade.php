@@ -55,21 +55,42 @@
 				</div>
 			</div>
 		</div>
+        <div class="my-8 p-8 bg-white rounded-md" >
+			<div class="flex items-center mb-6 justify-between">
+				<h1 class="font-semibold text-lg">Service History</h1>
+			</div>
+			@if (!$serviceHistories->isEmpty())
+				<table class="border w-full text-sm text-left rtl:text-right text-gray-500">
+					<thead class="text-xs text-gray-700 uppercase bg-gray-50">
+						<tr>
+							<th class="px-6 py-3" scope="col">Service</th>
+							<th class="px-6 py-3" scope="col">Date</th>
+							<th class="px-6 py-3" scope="col">Time</th>
+							<th class="px-6 py-3" scope="col">Remark</th>
+						</tr>
+
+					</thead>
+					<tbody>
+						@foreach ($serviceHistories as $serviceHistory)
+							<tr class="border-y odd:bg-white even:bg-gray-100">
+								<td class="px-6 py-3" scope="col"><span class="text-primary font-semibold">{{ $serviceHistory->service->name }}</span></td>
+								<td class="px-6 py-3" scope="col">{{ Carbon\Carbon::parse($serviceHistory->date)->format('F j, Y') }}</td>
+								<td class="px-6 py-3" scope="col">{{ $serviceHistory->time }}</td>
+								<td class="px-6 py-3" scope="col">{{ $serviceHistory->remark }}</td>
+
+						@endforeach
+					</tbody>
+				</table>
+                <div class="p-4">
+                    {{ $serviceHistories->links('pagination::tailwind') }}
+                </div>
+			@else
+				<p>No record</p>
+			@endif
+		</div>
 		<div class="my-8 p-8 bg-white rounded-md" >
 			<div class="flex items-center mb-6 justify-between">
 				<h1 class="font-semibold text-lg">Medical History</h1>
-				<a class="text-primary cursor-pointer" id="add-medical-history-btn">
-					<?xml version="1.0" ?>
-					<!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'><svg
-						fill="currentColor" height="30px" id="Layer_1" style="enable-background:new 0 0 32 32;" version="1.1"
-						viewBox="0 0 32 32" width="30px" xml:space="preserve" xmlns:xlink="http://www.w3.org/1999/xlink"
-						xmlns="http://www.w3.org/2000/svg">
-						<path
-							d="M28,14H18V4c0-1.104-0.896-2-2-2s-2,0.896-2,2v10H4c-1.104,0-2,0.896-2,2s0.896,2,2,2h10v10c0,1.104,0.896,2,2,2  s2-0.896,2-2V18h10c1.104,0,2-0.896,2-2S29.104,14,28,14z" />
-					</svg>
-				</a>
-                    <x-add_medical_history_modal :patientId="$patient->id"/>
-
 			</div>
 			@if (!$medicalHistories->isEmpty())
 				<table class="border w-full text-sm text-left rtl:text-right text-gray-500">
@@ -85,7 +106,7 @@
 					<tbody>
 						@foreach ($medicalHistories as $medicalHistory)
 							<tr class="border-y odd:bg-white even:bg-gray-100">
-								<td class="px-6 py-3" scope="col">{{ $medicalHistory->condition }}</td>
+								<td class="px-6 py-3" scope="col"><span class="text-primary font-semibold">{{ $medicalHistory->condition }}</span></td>
 								<td class="px-6 py-3" scope="col">{{ $medicalHistory->diagnosed_date_formatted }}</td>
 								<td class="px-6 py-3 font-semibold" scope="col">
                                     @if ($medicalHistory->status == 'active')
@@ -101,9 +122,9 @@
                                     data-description="{{ $medicalHistory->description }}"
                                     data-id="{{ $medicalHistory->id }}"
                                     onclick="openMedicalHistoryModal(this)"
-										class="edit-medical-history-btn font-medium text-white bg-blue-600 px-2 py-1 rounded hover:bg-blue-700">View</button></td>
+										class="view-medical-history-btn font-medium text-white bg-blue-600 px-2 py-1 rounded hover:bg-blue-700">View</button></td>
 							</tr>
-                            <x-edit_medical_history_modal :patientId="$patient->id"/>
+                            <x-view_medical_history_modal :patientId="$patient->id"/>
 						@endforeach
 					</tbody>
 				</table>
@@ -154,12 +175,10 @@
 
     <script>
     // Get references to the button, modal, and close button
-    const addBtn = document.querySelector('#add-medical-history-btn');
-    const editBtns = document.querySelectorAll('.edit-medical-history-btn')
+    const viewBtns = document.querySelectorAll('.view-medical-history-btn')
     const addModal = document.querySelector('#add-medical-history-modal');
-    const editModal = document.querySelector('.edit-medical-history-modal');
-    const closeAddBtn = document.querySelector('#add-medical-history-close-btn');
-    const closeEditBtn = document.querySelector('.edit-medical-history-close-btn');
+    const viewModal = document.querySelector('.view-medical-history-modal');
+    const closeViewBtn = document.querySelector('.view-medical-history-close-btn');
 
     function formatDateTime(dateTimeString) {
         // Split the string by space and take the first part
@@ -175,7 +194,6 @@
         const treatment = button.getAttribute('data-treatment');
         const description = button.getAttribute('data-description');
         const id = button.getAttribute('data-id');
-        console.log(treatment)
 
         document.querySelector('#edit-condition').value = condition;
         document.querySelector('#edit-diagnosed_date').value = formatDateTime(diagnosedDate);
@@ -187,26 +205,17 @@
     }
 
 
-    // Function to toggle modal visibility
-    function toggleAddModal() {
-        addModal.classList.toggle('hidden');
-        addModal.classList.toggle('flex');
-    }
-
     function toggleEditModal() {
-        editModal.classList.toggle('hidden')
-        editModal.classList.toggle('flex')
+        viewModal.classList.toggle('hidden')
+        viewModal.classList.toggle('flex')
     }
 
-    // Event listeners for button and close button
-    addBtn.addEventListener('click', toggleAddModal);
-    closeAddBtn.addEventListener('click', toggleAddModal);
 
-    editBtns.forEach(editBtn => {
-        editBtn.addEventListener('click', toggleEditModal);
+    viewBtns.forEach(viewBtn => {
+        viewBtn.addEventListener('click', toggleEditModal);
     });
 
-    closeEditBtn.addEventListener('click', toggleEditModal);
+    closeViewBtn.addEventListener('click', toggleEditModal);
 </script>
 
 

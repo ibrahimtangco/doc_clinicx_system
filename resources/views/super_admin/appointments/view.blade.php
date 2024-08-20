@@ -126,6 +126,6 @@
 			{{ $appointments->links('pagination::tailwind') }}
 		</div>
 
-		<script src="{{ asset('js/filterByStatus.js') }}"></script>
+		{{-- <script src="{{ asset('js/filterByStatus.js') }}"></script> --}}
 		<script src="{{ asset('js/filterByDate.js') }}"></script>
 </x-app-layout>

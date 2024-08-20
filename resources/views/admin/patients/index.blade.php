@@ -34,16 +34,13 @@
 				</a>
 				<x-search id="searchPatient" value="Patients" />
 			</div>
-
 			@if ($patients->count() > 0)
 				<div class="relative overflow-x-auto shadow-md sm:rounded-lg">
 					<table class="p-2 w-full text-sm text-left rtl:text-right text-gray-500">
 						<div id="all">
 							<thead class="text-xs text-gray-700 uppercase bg-gray-50">
 								<tr>
-									<th class="px-6 py-3" scope="col">First Name</th>
-									<th class="px-6 py-3" scope="col">Middle Name</th>
-									<th class="px-6 py-3" scope="col">Last Name</th>
+									<th class="px-6 py-3" scope="col">Name</th>
 									<th class="px-6 py-3" scope="col">Address</th>
 									<th class="px-6 py-3" scope="col">Email</th>
 									<th class="px-6 py-3" scope="col"><span class="sr-only">Action</span></th>
@@ -52,9 +49,7 @@
 							<tbody id="allData">
 								@foreach ($patients as $patient)
 									<tr class="bg-white border-b hover:bg-gray-50">
-										<td class="px-6 py-4">{{ $patient->user->first_name }}</td>
-										<td class="px-6 py-4">{{ $patient->user->middle_name }}</td>
-										<td class="px-6 py-4">{{ $patient->user->last_name }}</td>
+										<td class="px-6 py-4">{{ $patient->user->full_name }}</td>
 										<td class="px-6 py-4">{{ $patient->user->address }}</td>
 										<td class="px-6 py-4">{{ $patient->user->email }}</td>
 										<td class="px-6 py-4 text-right space-x-2 flex items-center">
@@ -117,7 +112,7 @@
 
 			$.ajax({
 				type: 'get',
-				url: '{{ URL::to('admin/patient/search') }}',
+				url: '{{ route('admin.search.patient') }}',
 				data: {
 					'search': $searchValue
 				},

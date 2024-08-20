@@ -106,7 +106,7 @@
 					@csrf
 					<div class="flex flex-col gap-2 mt-1">
 						<label for="status">Appointment Status</label>
-						<select class="p-2 rounded-md bg-gray-100/80 border-gray-300" name="status">
+						<select class="p-2 rounded-md bg-gray-100/80 border-gray-300" name="status" {{ $appointmentInfo['appointment']->status !== 'booked' ? 'disabled' : ''}}>
 							<option {{ $appointmentInfo['appointment']->status == 'booked' ? 'selected' : '' }} value="booked">Booked
 							</option>
 							<option {{ $appointmentInfo['appointment']->status == 'cancelled' ? 'selected' : '' }} value="cancelled">
@@ -118,13 +118,15 @@
 
 					<div class="flex flex-col gap-2 mt-1 w-full">
 						<label for="remark">Dentist Remarks / <span class="text-primary">Reason for Cancel</span></label>
-						<textarea class="w-full border-gray-300 rounded-md bg-gray-100/80" id="remark" name="remark">{{ $appointmentInfo['appointment']->remark }}</textarea>
+						<textarea class="w-full border-gray-300 rounded-md bg-gray-100/80" id="remark" name="remark" {{ $appointmentInfo['appointment']->status !== 'booked' ? 'disabled' : ''}}>{{ $appointmentInfo['appointment']->remark }}</textarea>
 					</div>
 
 					<div class="flex justify-end mt-4">
-						<x-primary-button type="submit">
+						@if ($appointmentInfo['appointment']->status === 'booked')
+                            <x-primary-button type="submit">
 							{{ __('Update') }}
 						</x-primary-button>
+                        @endif
 
 					</div>
 				</form>

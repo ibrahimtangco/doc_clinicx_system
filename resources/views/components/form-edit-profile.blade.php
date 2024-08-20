@@ -5,6 +5,16 @@
     'barangays' => $barangays,
     'modifiedAddress' => $modifiedAddress,
 ])
+    @if (request()->routeIs('superadmin.profile.edit'))
+        <div class="w-full">
+            <x-input-label :value="__('Title')" for="title" />
+            <select autocomplete="title"
+                class="w-full mt-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" id="title"
+                name="title">
+                <option value="Dr." {{ $user->provider->title === "Dr." ? 'selected' : '' }}>Dr.</option>
+            </select>
+        </div>
+    @endif
 <div class="flex items-center gap-2">
     <div>
         <x-input-label :value="__('First Name')" for="first_name" />
@@ -12,7 +22,6 @@
             name="first_name" required type="text" />
         <x-input-error :messages="$errors->get('first_name')" class="mt-2" />
     </div>
-
     <div>
         <x-input-label :value="__('Middle Name')" for="middle_name" />
         <x-text-input :value="old('middle_name', $user->middle_name)" autocomplete="middle_name" autofocus class="mt-1 block w-full" id="middle_name"
@@ -27,7 +36,33 @@
         <x-input-error :messages="$errors->get('last_name')" class="mt-2" />
     </div>
 </div>
+@if (request()->routeIs('superadmin.profile.edit'))
+	<div class="w-full">
+		<x-input-label :value="__('Specialization')" for="specialization" />
+		<select autocomplete="specialization"
+			class="w-full mt-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+			id="specialization" name="specialization">
+			<option {{ $user->provider->title === 'General Dentist' ? 'selected' : '' }} value="General Dentist">General Dentist</option>
+		</select>
+	</div>
+	<input name="userType" type="hidden" value="SuperAdmin">
+@endif
+@if (request()->routeIs('profile.edit'))
+	<div class="md:flex space-y-2 items-center justify-between gap-2 md:space-y-0 mt-4">
+		<div class="w-full">
+			<x-input-label :value="__('Birthday')" for="birthday" />
+			<x-text-input :value="old('birthday', $user->patient->birthday)" autofocus class="mt-1 w-full" id="birthday" name="birthday" type="date" />
+			<x-input-error :messages="$errors->get('birthday')" class="mt-2" />
+		</div>
 
+		<div class="w-full">
+			<x-input-label :value="__('Age')" for="age" />
+			<input class="hidden" id="hiddenAge" name="age" type="text" value="{{ old('age', $user->patient->age) }}">
+			<x-text-input :value="old('age', $user->patient->age)" autofocus class="mt-1 w-full" disabled id="age" type="text" />
+			<x-input-error :messages="$errors->get('age')" class="mt-2" />
+		</div>
+	</div>
+@endif
 <div class="mt-4">
     <x-input-label :value="__('Province')" for="province" />
     <select autocomplete="province"
@@ -77,7 +112,32 @@
         type="text" />
     <x-input-error :messages="$errors->get('street')" class="mt-2" />
 </div>
+@if (request()->routeIs('profile.edit'))
+	<div class="grid md:grid-cols-2 gap-2">
+		<div>
+			<x-input-label :value="__('Phone')" for="telephone" />
+			<x-text-input :value="old('telephone', $user->patient->telephone)" autocomplete="username" class="block mt-1 w-full" id="telephone" name="telephone"
+				type="number" />
+			<x-input-error :messages="$errors->get('telephone')" class="mt-2" />
+		</div>
+		<div>
+			<x-input-label :value="__('Civil Status')" for="status" />
+			<select autocomplete="status"
+				class="w-full mt-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+				id="status" name="status">
+				<option value="">-Select Status-</option>
+				<option {{ $user->patient->status === 'Single' ? 'selected' : '' }} value="Single">Single</option>
+				<option {{ $user->patient->status === 'Married' ? 'selected' : '' }} value="Married">Married</option>
+				<option {{ $user->patient->status === 'Annulled' ? 'selected' : '' }} value="Annulled">Annulled</option>
+				<option {{ $user->patient->status === 'Widowed' ? 'selected' : '' }} value="Widowed">Widowed</option>
+				<option {{ $user->patient->status === 'Separated' ? 'selected' : '' }} value="Separated">Separated</option>
+				<option {{ $user->patient->status === 'Others' ? 'selected' : '' }} value="Others">Others</option>
+			</select>
+			<x-input-error :messages="$errors->get('status')" class="mt-2" />
+		</div>
 
+	</div>
+@endif
 <div>
     <x-input-label :value="__('Email')" for="email" />
     <x-text-input :value="old('email', $user->email)" autocomplete="username" class="mt-1 block w-full" id="email" name="email"

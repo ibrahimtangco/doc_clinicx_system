@@ -38,7 +38,7 @@ class AppointmentRequest extends FormRequest
             abort(422, 'invalid time');
         }
 
-        $isAlreadyExists = Appointment::where('date', $this->input('date'))->where('time', $this->input('time'))->exists();
+        $isAlreadyExists = Appointment::where('date', $this->input('date'))->where('time', $this->input('time'))->where('status', 'booked')->exists();
 
         if ($isAlreadyExists) {
             abort(422, 'already taken');

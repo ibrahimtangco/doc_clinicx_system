@@ -38,11 +38,15 @@ class Service extends Model
 
 
     // service and appointment relationship
-    public function appointments()
+    public function appointment()
     {
         return $this->hasMany(Appointment::class);
     }
 
+    public function appointment_history()
+    {
+        return $this->hasMany(AppointmentHistory::class);
+    }
     public function storeServicedetails($validated)
     {
 

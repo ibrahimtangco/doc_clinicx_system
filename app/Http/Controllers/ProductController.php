@@ -79,7 +79,7 @@ class ProductController extends Controller
             return redirect()->route('products.index');
         }
 
-        emotify('succes', 'Product delete successfully');
+        emotify('success', 'Product delete successfully');
         return redirect()->route('products.index');
     }
 

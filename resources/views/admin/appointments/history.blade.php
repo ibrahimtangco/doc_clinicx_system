@@ -88,6 +88,9 @@
 		<div class="mt-4">
 			{{ $appointments->links('pagination::tailwind') }}
 		</div>
+        <script>
+    window.userRole = @json(auth()->user()->userType);
 
+</script>
 		<script src="{{ asset('js/filterByStatus.js') }}"></script>
 </x-admin-layout>

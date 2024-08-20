@@ -3,26 +3,35 @@
 namespace App\Http\Controllers;
 
 use App\Models\City;
+use App\Models\User;
+use App\Models\Patient;
 use App\Models\Barangay;
+use App\Models\Provider;
 use App\Models\Province;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use App\Services\AddressService;
+use App\Services\PatientService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redirect;
 use App\Http\Requests\ProfileUpdateRequest;
-use App\Services\AddressService;
 
 class ProfileController extends Controller
 {
-    protected $addressService;
+    protected $addressService, $patientModel, $userModel, $patientService, $providerModel;
 
-    public function __construct(AddressService $addressService)
+    public function __construct(AddressService $addressService, PatientService $patientService, Provider $providerModel)
     {
         $this->addressService = $addressService;
+        $this->patientService = $patientService;
+        $this->providerModel = $providerModel;
+        $this->patientModel = new Patient();
+        $this->userModel = new User();
     }
-
     public function getCities($provinceCode)
     {
         $cities = json_decode(file_get_contents(config_path('cities.json')), true);
@@ -50,7 +59,7 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
-        $user = $request->user();
+        $user = auth()->user();
         $currentAddress = $user->address;
         $modifiedAddress = $this->addressService->getAddress($currentAddress);
 
@@ -74,15 +83,59 @@ class ProfileController extends Controller
             'SuperAdmin' => 'super_admin.super_admin_layouts.profile',
             default => 'profile.edit',
         };
-
         return view($view, compact('user', 'provinces', 'cities', 'barangays', 'modifiedAddress'));
     }
 
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request): RedirectResponse
     {
+        $user = auth()->user();
+        if ($user->userType === 'user') {
+            $validated = $request->validate([
+                'first_name' => ['required', 'string', 'max:255'],
+                'middle_name' => ['max:255'],
+                'last_name' => ['required', 'string', 'max:255'],
+                'telephone' => ['required', 'string', 'min:11', 'max:255'],
+                'birthday' => ['required', 'date'],
+                'age' => ['required', 'integer'],
+                'province' => ['required', 'string', 'max:255'],
+                'city' => ['required', 'string', 'max:255'],
+                'barangay' => ['required', 'string', 'max:255'],
+                'street' => ['max:255'],
+                'status' => ['required', 'max:255'],
+                'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+            ]);
+            $patient = Patient::where('user_id', $user->id)->first();
+        } elseif ($user->userType === 'SuperAdmin') {
+            $validated = $request->validate([
+                'title' => ['required', 'string'],
+                'first_name' => ['required', 'string', 'max:255'],
+                'middle_name' => ['max:255'],
+                'last_name' => ['required', 'string', 'max:255'],
+                'specialization' => ['required', 'string'],
+                'province' => ['required', 'string', 'max:255'],
+                'city' => ['required', 'string', 'max:255'],
+                'barangay' => ['required', 'string', 'max:255'],
+                'street' => ['max:255'],
+                'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+            ]);
+            $provider  = Provider::where('user_id', $user->id)->first();
+        } elseif ($user->userType === 'admin') {
+            $validated = $request->validate([
+                'first_name' => ['required', 'string', 'max:255'],
+                'middle_name' => ['max:255'],
+                'last_name' => ['required', 'string', 'max:255'],
+                'province' => ['required', 'string', 'max:255'],
+                'city' => ['required', 'string', 'max:255'],
+                'barangay' => ['required', 'string', 'max:255'],
+                'street' => ['max:255'],
+                'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+            ]);
+        }
+
+
         $rawBarangays = json_decode(file_get_contents(config_path('barangay.json')), true);
         $barangay = array_filter($rawBarangays, function ($barangay) use ($request) {
             return $barangay['brgy_code'] ===  $request->barangay;
@@ -109,13 +162,26 @@ class ProfileController extends Controller
             $address = $barangay['brgy_name'] . ', ' . $city['city_name'] . ', ' . $province['province_name'];
         }
 
-        $request->user()->update([
-            'first_name' => $request->first_name,
-            'middle_name' => $request->middle_name,
-            'last_name' => $request->last_name,
-            'address' => $address,
-            'email' => $request->email,
-        ]);
+        if ($user->userType == 'user') {
+            DB::transaction(function () use ($validated, $address, $patient) {
+                $this->userModel->updateUserDetails($validated, $address, $patient->user_id);
+                $this->patientModel->updatePatientDetails($validated, $patient->id);
+            });
+        } elseif ($user->userType == 'SuperAdmin') {
+            DB::transaction(function () use ($validated, $address, $provider) {
+                $this->userModel->updateUserDetails($validated, $address, $provider->user_id);
+                $this->providerModel->updateProviderDetails($validated, $provider->id);
+            });
+        } elseif ($user->userType == 'admin') {
+
+            $user = $user->update([
+                'first_name' => $validated['first_name'],
+                'middle_name' => $validated['middle_name'],
+                'last_name' => $validated['last_name'],
+                'address' => $address,
+                'email' => $validated['email']
+            ]);
+        }
 
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;

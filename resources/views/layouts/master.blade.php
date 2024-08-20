@@ -23,14 +23,17 @@
 	<!-- Fonts -->
 	<link href="https://fonts.bunny.net" rel="preconnect">
 	<link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
-	{{-- @notifyCss --}}
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=League+Gothic&display=swap" rel="stylesheet">
+    {{-- @notifyCss --}}
 </head>
 
 <body class="font-sans antialiased" class=" text-dark" x-data="{ isAsideOpen: false }">
 	<div>
 		{{ $slot }}
 	</div>
-	<x-notify::notify"/>
+	<x-notify::notify/>
 	@notifyJs
 </body>
 

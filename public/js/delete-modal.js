@@ -4,11 +4,11 @@ const deleteBtns = document.querySelectorAll('.delete-btn');
             const confirmDeleteBtn = document.querySelector('#confirm-delete');
             const cancelBtn = document.querySelector('#cancel-btn')
             let formToSubmit;
-
             function openModal(form) {
                 formToSubmit = form;
                 confirmDeleteModal.classList.remove('hidden');
                 confirmDeleteModal.classList.add('flex');
+                console.log(formToSubmit)
             }
 
             function closeModal() {
@@ -35,4 +35,3 @@ const deleteBtns = document.querySelectorAll('.delete-btn');
                 confirmDeleteModal.classList.remove('flex');
             })
 
-            console.log(cancelBtn)

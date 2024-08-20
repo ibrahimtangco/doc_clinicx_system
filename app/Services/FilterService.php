@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Appointment;
+use App\Models\AppointmentHistory;
 
 class FilterService
 {
@@ -13,7 +14,7 @@ class FilterService
             abort(400, 'Status is required');
         }
 
-        $query = Appointment::orderBy('date')
+        $query = AppointmentHistory::orderBy('date')
             ->orderBy('time')
             ->with(['user:id,first_name,last_name,middle_name', 'service:id,name']);
 

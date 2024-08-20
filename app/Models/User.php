@@ -49,14 +49,24 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
     // user and appointment relationship
-    public function appointments()
+    public function appointment()
     {
         return $this->hasMany(Appointment::class);
     }
 
+    public function appointment_history()
+    {
+        return $this->hasMany(AppointmentHistory::class);
+    }
+
     public function patient()
     {
-        return $this->hasOne(Patient::class);
+        return $this->hasOne(Patient::class, 'user_id', 'id');
+    }
+
+    public function provider()
+    {
+        return $this->hasOne(Provider::class, 'user_id', 'id');
     }
 
     public function getFullNameAttribute()
