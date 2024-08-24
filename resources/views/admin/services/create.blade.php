@@ -53,7 +53,10 @@
 
                              <div class="mt-4">
 								<x-input-label :value="__('Is Available')" for="availability" />
-								<input type="checkbox" name="availability" :value="old('availability') == true ? 'checked' : ''" class="rounded border-gray-300"/>
+								<input type="checkbox" name="availability" value="1"
+       {{ old('availability', true) ? 'checked' : '' }}
+       class="rounded border-gray-300"/>
+
 								<x-input-error :messages="$errors->get('availability')" class="mt-2" />
 							</div>
 

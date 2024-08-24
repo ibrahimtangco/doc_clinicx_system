@@ -1,7 +1,7 @@
 <x-admin-layout>
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-			<a href="{{ route('providers.index') }}">{{ __('Providers') }}</a>
+			<a href="{{ route('providers.index') }}">{{ __('Dentists') }}</a>
 		</h2>
 	</x-slot>
 
@@ -38,6 +38,5 @@
 		</div>
 	</div>
 
-	<script src="{{ asset('js/autofill_age.js') }}"></script>
 	<script src="{{ asset('js/register_address_handler.js') }}"></script>
 </x-admin-layout>

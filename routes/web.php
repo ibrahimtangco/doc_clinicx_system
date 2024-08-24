@@ -132,12 +132,12 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 });
 
 //! Admin Route Views
-Route::middleware(['auth', 'role:admin'])->group(function () {
+// Route::middleware(['auth', 'role:admin'])->group(function () {
 
-    Route::get('admin/inventory', function () {
-        return view('admin.inventroy');
-    })->name('admin.inventory');
-});
+//     Route::get('admin/inventory', function () {
+//         return view('admin.inventroy');
+//     })->name('admin.inventory');
+// });
 
 Route::middleware(['auth', 'role:SuperAdmin'])->group(function () {
     // Route::get('superadmin', [SuperAdminController::class, 'index'])->name('super_admin.dashboard');
@@ -167,7 +167,11 @@ Route::middleware(['auth', 'role:SuperAdmin'])->group(function () {
     Route::get('superadmin/preview-pdf/{prescription}', [PrintController::class, 'previewPDF'])->name('superadmin.prescriptions.previewPDF');
 });
 
+Route::get('admin/settings', function () {
+    return view('admin.settings.settings');
+})->name('admin.settings');
 
+// test
 Route::get('/test-notif', function () {
     $appointments = Appointment::whereDate('date', Carbon::tomorrow())->get();
 

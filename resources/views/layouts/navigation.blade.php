@@ -7,7 +7,9 @@
 				<div class="shrink-0 flex items-center">
 					<a class="flex items-center" href="{{ url('/') }}">
 						<img alt="" class="w-20 -ml-3" src="{{ asset('images/LOGO_ICON.png') }}">
-						<span class="-ml-1 font-logo text-3xl">DocClinix</span>
+						<span class="-ml-1 font-logo text-3xl">
+                        DocClinicx
+                        </span>
 					</a>
 				</div>
 

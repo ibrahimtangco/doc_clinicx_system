@@ -122,7 +122,7 @@ class AppointmentController extends Controller
         unset($data['service_name']);
         $appointment = Appointment::create($data);
         $admin = User::where('userType', 'admin')->get();
-        // Notification::send($admin, new AppointmentBooked($data));
+        Notification::send($admin, new AppointmentBooked($data));
 
         if (!$appointment) {
             emotify('error', 'Failed to book appointment');
@@ -172,7 +172,7 @@ class AppointmentController extends Controller
         $updatedAppointment = $appointmentToUpdate;
         if ($appointmentToUpdate->status == 'cancelled') {
             AppointmentHistory::create($updatedAppointment->toArray());
-            // $user->notify(new AppointmentCancelled($updatedAppointment));
+            $user->notify(new AppointmentCancelled($updatedAppointment));
         } else if ($appointmentToUpdate->status == 'completed') {
             AppointmentHistory::create($updatedAppointment->toArray());
             // $user->notify(new AppointmentCompleted($updatedAppointment));
