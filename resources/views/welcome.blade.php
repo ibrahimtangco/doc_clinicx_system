@@ -121,20 +121,31 @@
 					<p class="leading-relaxed mb-1 text-desc">Feel free to contact us any time. We will get back to you as soon as we
 						can!</p>
 					<div class="relative mb-4">
-						<label class="leading-7 text-sm text-desc" for="email">Email</label>
-						<input
-							class="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
-							id="email" name="email" type="email">
+						<label class="leading-7 text-sm text-desc" for="email">Emails</label>
+						<div class="space-y-2">
+							@foreach ($contacts as $contact)
+								@if (!empty($contact->email))
+									<div class="p-2 border rounded-md">
+										{{ $contact->email }}
+
+									</div>
+								@endif
+							@endforeach
+						</div>
 					</div>
 					<div class="relative mb-4">
-						<label class="leading-7 text-sm text-desc" for="message">Message</label>
-						<textarea
-						 class="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 h-32 text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"
-						 id="message" name="message"></textarea>
+						<label class="leading-7 text-sm text-desc" for="email">Phone Numbers</label>
+						<div class="space-y-2">
+							@foreach ($contacts as $contact)
+								@if (!empty($contact->phone_number))
+									<div class="p-2 border rounded-md">
+										{{ $contact->phone_number }}
+
+									</div>
+								@endif
+							@endforeach
+						</div>
 					</div>
-					<x-primary-button class="py-4">
-						{{ __('Send') }}
-					</x-primary-button>
 					<p class="text-xs text-gray-500 mt-3">Filarca-Rabena Dental Clinic and Dental Supply Official website.</p>
 				</div>
 			</div>
@@ -147,9 +158,10 @@
 					<span class="ml-3 text-3xl font-logo font-semibold">DocClinicx</span>
 				</a>
 				<p class="text-sm text-gray-500 sm:ml-4 sm:pl-4 sm:border-l-2 sm:border-gray-200 sm:py-2 sm:mt-0 mt-4">© 2024
-					DocClinicx —
+					{{-- DocClinicx —
 					<a class="text-desc ml-1" href="https://twitter.com/knyttneve" rel="noopener noreferrer"
-						target="_blank">Filarca-Rabena</a>
+						target="_blank">Filarca-Rabena</a> --}}
+                        {{ $footer->description }}
 				</p>
 				<span class="inline-flex sm:ml-auto sm:mt-0 mt-4 justify-center sm:justify-start">
 					{{-- facebook --}}

@@ -3,11 +3,15 @@
 
 use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Footer;
+use App\Models\Contact;
 use App\Models\Appointment;
 use Illuminate\Support\Facades\Route;
 use Spatie\Activitylog\Models\Activity;
 use App\Http\Controllers\PrintController;
+use App\Http\Controllers\FooterController;
 use App\Notifications\AppointmentReminder;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
@@ -16,6 +20,7 @@ use App\Http\Controllers\BarangayController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProviderController;
 use Illuminate\Support\Facades\Notification;
+use App\Http\Controllers\AppSettingController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\BusinessHourController;
@@ -45,7 +50,9 @@ Route::get('/test_log', function () {
 });
 // Home Route
 Route::get('/', function () {
-    return view('welcome');
+    $contacts = Contact::all();
+    $footer = Footer::first();
+    return view('welcome', compact('contacts', 'footer'));
 });
 
 // User View Services
@@ -129,6 +136,13 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('admin/prescriptions', PrescriptionController::class)->names('admin.prescriptions');
     Route::get('admin/download-pdf/{prescription}', [PrintController::class, 'downloadPDF'])->name('admin.prescriptions.downloadPDF');
     Route::get('admin/preview-pdf/{prescription}', [PrintController::class, 'previewPDF'])->name('admin.prescriptions.previewPDF');
+
+    Route::get('admin/settings', [AppSettingController::class, 'index'])->name('admin.settings');
+
+    Route::patch('admin/contacts/unset/{contact}', [ContactController::class, 'unset'])->name('unset');
+    Route::resource('admin/contacts', ContactController::class);
+
+    Route::patch('admin/footer/{footer}', [FooterController::class, 'update'])->name('footer.update');
 });
 
 //! Admin Route Views
@@ -167,9 +181,6 @@ Route::middleware(['auth', 'role:SuperAdmin'])->group(function () {
     Route::get('superadmin/preview-pdf/{prescription}', [PrintController::class, 'previewPDF'])->name('superadmin.prescriptions.previewPDF');
 });
 
-Route::get('admin/settings', function () {
-    return view('admin.settings.settings');
-})->name('admin.settings');
 
 // test
 Route::get('/test-notif', function () {

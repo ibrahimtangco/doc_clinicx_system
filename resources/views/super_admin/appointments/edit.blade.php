@@ -100,7 +100,9 @@
 		<div class="my-8 p-8 bg-white rounded-md border">
 			<div class="flex items-center justify-between">
 				<h1 class="font-semibold text-lg mb-4">Appointment Status Update</h1>
-				<a class="text-primary underline" href="{{ route('create.prescription', ['patient' => $appointmentInfo['patient']]) }}">Write prescription</a>
+				@if ($appointmentInfo['appointment']->status === 'booked')
+                    <a class="text-primary underline" href="{{ route('create.prescription', ['patient' => $appointmentInfo['patient']]) }}">Write prescription</a>
+                @endif
 			</div>
 			<div class=" gap-8">
 				<form action="{{ route('superadmin.edit-appointment', $appointmentInfo['appointment']->id) }}" class="space-y-4"
