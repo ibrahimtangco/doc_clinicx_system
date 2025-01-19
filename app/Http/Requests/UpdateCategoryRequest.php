@@ -23,7 +23,7 @@ class UpdateCategoryRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:50',
-            'description' => 'nullable|max:255',
+            'description' => 'required|max:255|string',
             'availability' => 'sometimes'
         ];
     }

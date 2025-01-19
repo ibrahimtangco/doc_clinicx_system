@@ -2,13 +2,18 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use Spatie\Activitylog\LogOptions;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Patient extends Model
 {
     use HasFactory;
+
+
 
     protected $guarded = [];
 
@@ -17,9 +22,14 @@ class Patient extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function prescription()
+    public function prescriptions()
     {
         return $this->hasMany(Prescription::class);
+    }
+
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
     }
 
     public function storePatientDetails($user_id, $validated)

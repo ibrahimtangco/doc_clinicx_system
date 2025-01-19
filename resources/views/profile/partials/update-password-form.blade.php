@@ -9,40 +9,83 @@
         </p>
     </header>
 
-    <form method="post" action="{{ route('password.update') }}" class="mt-6 space-y-6">
+    <form action="{{ route('password.update') }}" class="mt-6 space-y-6" method="post">
         @csrf
         @method('put')
-
-        <div>
-            <x-input-label for="update_password_current_password" :value="__('Current Password')" />
-            <x-text-input id="update_password_current_password" name="current_password" type="password" class="mt-1 block w-full" autocomplete="current-password" />
+        <!-- Current Password -->
+        <div class="mt-4">
+            <div class="py-2" x-data="{ show: true }">
+                <x-input-label :value="__('Current Password')" for="update_password_current_password" />
+                <div class="relative">
+                    <input :type="show ? 'password' : 'text'" autocomplete="current-password"
+                        class="text-md block px-3 py-2 rounded-md w-full
+                bg-white border border-gray-300 shadow-sm
+                focus:bg-white
+                focus:border-indigo-500
+                focus:ring-indigo-500
+                focus:outline-none {{ $errors->updatePassword->has('current_password') ? 'is-invalid' : '' }} {{ $errors->updatePassword->has('password') ? 'is-invalid' : '' }}"
+                        id="update_password_current_password" name="current_password">
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
+                        <i :class="show ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'" @click="show = !show"
+                            aria-hidden="true" class="cursor-pointer text-gray-500 hover:text-gray-700"></i>
+                    </div>
+                </div>
+            </div>
             <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-2" />
         </div>
 
-        <div>
-            <x-input-label for="update_password_password" :value="__('New Password')" />
-            <x-text-input id="update_password_password" name="password" type="password" class="mt-1 block w-full" autocomplete="new-password" />
+        <!-- New Password -->
+        <div class="mt-4">
+            <div class="py-2" x-data="{ show: true }">
+                <x-input-label :value="__('New Password')" for="update_password_password" />
+                <div class="relative">
+                    <input :type="show ? 'password' : 'text'" autocomplete="new-password"
+                        class="text-md block px-3 py-2 rounded-md w-full
+                bg-white border border-gray-300 shadow-sm
+                focus:bg-white
+                focus:border-indigo-500
+                focus:ring-indigo-500
+			focus:outline-none"
+                        id="update_password_password" name="password">
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
+                        <i :class="show ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'" @click="show = !show"
+                            aria-hidden="true" class="cursor-pointer text-gray-500 hover:text-gray-700"></i>
+                    </div>
+                </div>
+            </div>
             <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-2" />
         </div>
 
-        <div>
-            <x-input-label for="update_password_password_confirmation" :value="__('Confirm Password')" />
-            <x-text-input id="update_password_password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" autocomplete="new-password" />
+        <!-- Confirm Password -->
+        <div class="mt-4">
+            <div class="py-2" x-data="{ show: true }">
+                <x-input-label :value="__('Confirm Password')" for="update_password_password_confirmation" />
+                <div class="relative">
+                    <input :type="show ? 'password' : 'text'" autocomplete="password"
+                        class="prevent-paste text-md block px-3 py-2 rounded-md w-full
+                bg-white border border-gray-300 shadow-sm
+                focus:bg-white
+                focus:border-indigo-500
+                focus:ring-indigo-500
+                focus:outline-none"
+                        id="update_password_password_confirmation" name="password_confirmation">
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
+                        <i :class="show ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'" @click="show = !show"
+                            aria-hidden="true" class="cursor-pointer text-gray-500 hover:text-gray-700"></i>
+                    </div>
+                </div>
+            </div>
             <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
         </div>
 
         <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
-
+            <x-primary-button class="w-full md:w-fit">{{ __('Update') }}</x-primary-button>
             @if (session('status') === 'password-updated')
-                <p
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-transition
-                    x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600 dark:text-gray-400"
-                >{{ __('Saved.') }}</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400" x-data="{ show: true }" x-init="setTimeout(() => show = false, 2000)"
+                    x-show="show" x-transition>{{ __('Saved.') }}</p>
             @endif
         </div>
     </form>
 </section>
+<script src="{{ asset('js/preventPaste.js') }}"></script>
+

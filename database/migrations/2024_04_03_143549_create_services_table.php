@@ -15,8 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->text('description');
-            $table->integer('duration');
-            $table->integer('price');
             $table->boolean('availability')->default(true);
             $table->timestamps();
         });

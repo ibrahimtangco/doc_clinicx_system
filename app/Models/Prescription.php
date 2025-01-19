@@ -23,7 +23,13 @@ class Prescription extends Model
     protected $fillable = [
         'medicines',
         'patient_id',
+        'provider_id',
         'quantities',
         'dosages'
     ];
+
+    public function provider()
+    {
+        return $this->belongsTo(Provider::class);
+    }
 }

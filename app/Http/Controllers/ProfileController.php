@@ -2,23 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\City;
+
 use App\Models\User;
 use App\Models\Patient;
-use App\Models\Barangay;
 use App\Models\Provider;
-use App\Models\Province;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Services\AddressService;
 use App\Services\PatientService;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Redirect;
-use App\Http\Requests\ProfileUpdateRequest;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -80,141 +75,170 @@ class ProfileController extends Controller
 
         $view = match ($userType) {
             'admin' => 'admin.admin_layouts.profile',
-            'SuperAdmin' => 'super_admin.super_admin_layouts.profile',
+            'staff' => 'admin.admin_layouts.profile',
+            'superadmin' => 'super_admin.super_admin_layouts.profile',
             default => 'profile.edit',
         };
-        return view($view, compact('user', 'provinces', 'cities', 'barangays', 'modifiedAddress'));
+        return view($view, compact('user', 'provinces', 'cities', 'barangays', 'modifiedAddress'))->with('title', 'Profile | Update Information');
     }
 
     /**
      * Update the user's profile information.
      */
+
     public function update(Request $request): RedirectResponse
     {
         $user = auth()->user();
-        if ($user->userType === 'user') {
-            $validated = $request->validate([
-                'first_name' => ['required', 'string', 'max:255'],
-                'middle_name' => ['max:255'],
-                'last_name' => ['required', 'string', 'max:255'],
-                'telephone' => ['required', 'string', 'min:11', 'max:255'],
+        $validated = $this->validateRequest($request, $user->userType);
+
+        // Load address components
+        $address = $this->buildAddress($request);
+
+        // Update user details and related models based on user type
+        if ($user->userType == 'user') {
+            $patient = Patient::where('user_id', $user->id)->first();
+
+            DB::transaction(function () use ($validated, $address, $patient) {
+                $this->userModel->updateUserDetails($validated, $address, $patient->user_id);
+                $this->patientModel->updatePatientDetails($validated, $patient->id);
+            });
+        } elseif ($user->userType == 'superadmin') {
+            $provider = Provider::where('user_id', $user->id)->first();
+
+            DB::transaction(function () use ($validated, $address, $provider) {
+                $this->userModel->updateUserDetails($validated, $address, $provider->user_id);
+                $this->providerModel->updateProviderDetails($validated, $provider->id);
+            });
+        } elseif (in_array($user->userType, ['admin', 'staff'])) {
+            $this->userModel->updateUserDetails($validated, $address, $user->id);
+        }
+
+        // Reset email verification if email was changed
+        if ($request->user()->isDirty('email')) {
+            $request->user()->email_verified_at = null;
+        }
+
+        $userSaved = $request->user()->save();
+        if (!$userSaved) {
+            emotify('error', 'Failed to update profile');
+            return redirect()->back();
+        }
+
+        // Display success message after saving
+        emotify('success', 'Profile updated successfully');
+        return redirect()->back();
+    }
+
+    /**
+     * Validate the request based on user type.
+     */
+    protected function validateRequest(Request $request, string $userType): array
+    {
+        if ($userType === 'user') {
+            return $request->validate([
+                'first_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\'-]+$/'],
+                'middle_name' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z\s\'-]+$/'],
+                'last_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\'-]+$/'],
+                'telephone' => ['required', 'string', 'regex:/^(09[0-9]{9}|\+63[9][0-9]{9})$/'],
                 'birthday' => ['required', 'date'],
-                'age' => ['required', 'integer'],
+                'age' => ['required', 'integer', 'min:1'],
                 'province' => ['required', 'string', 'max:255'],
                 'city' => ['required', 'string', 'max:255'],
                 'barangay' => ['required', 'string', 'max:255'],
-                'street' => ['max:255'],
-                'status' => ['required', 'max:255'],
-                'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+                'street' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9\s,.-]+$/'],
+                'status' => ['required', 'in:Single,Married,Annulled,Widowed,Separated,Others'],
+                'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore(auth()->id())],
             ]);
-            $patient = Patient::where('user_id', $user->id)->first();
-        } elseif ($user->userType === 'SuperAdmin') {
-            $validated = $request->validate([
+        } elseif ($userType === 'superadmin') {
+            return $request->validate([
                 'title' => ['required', 'string'],
-                'first_name' => ['required', 'string', 'max:255'],
-                'middle_name' => ['max:255'],
-                'last_name' => ['required', 'string', 'max:255'],
+                'reg_number' => ['required', 'string', Rule::unique(Provider::class)->ignore(auth()->id(), 'user_id')],
+                'first_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\'-]+$/'],
+                'middle_name' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z\s\'-]+$/'],
+                'last_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\'-]+$/'],
                 'specialization' => ['required', 'string'],
                 'province' => ['required', 'string', 'max:255'],
                 'city' => ['required', 'string', 'max:255'],
                 'barangay' => ['required', 'string', 'max:255'],
-                'street' => ['max:255'],
-                'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+                'street' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9\s,.-]+$/'],
+                'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore(auth()->id())],
             ]);
-            $provider  = Provider::where('user_id', $user->id)->first();
-        } elseif ($user->userType === 'admin') {
-            $validated = $request->validate([
-                'first_name' => ['required', 'string', 'max:255'],
-                'middle_name' => ['max:255'],
-                'last_name' => ['required', 'string', 'max:255'],
+        } else { // Admin or Staff
+            return $request->validate([
+                'first_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\'-]+$/'],
+                'middle_name' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z\s\'-]+$/'],
+                'last_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\'-]+$/'],
                 'province' => ['required', 'string', 'max:255'],
                 'city' => ['required', 'string', 'max:255'],
                 'barangay' => ['required', 'string', 'max:255'],
-                'street' => ['max:255'],
-                'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
+                'street' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9\s,.-]+$/'],
+                'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore(auth()->id())],
             ]);
         }
+    }
 
-
+    /**
+     * Build the full address string from request data.
+     */
+    protected function buildAddress(Request $request): string
+    {
         $rawBarangays = json_decode(file_get_contents(config_path('barangay.json')), true);
         $barangay = array_filter($rawBarangays, function ($barangay) use ($request) {
-            return $barangay['brgy_code'] ===  $request->barangay;
+            return $barangay['brgy_code'] === $request->barangay;
         });
-        $barangay = reset($barangay); // Get the first (and only) barangay if it exists
+        $barangay = reset($barangay);
 
         $rawCities = json_decode(file_get_contents(config_path('cities.json')), true);
         $city = array_filter($rawCities, function ($city) use ($request) {
             return $city['city_code'] === $request->city;
         });
-        $city = reset($city); // Get the first (and only) city if it exists
+        $city = reset($city);
 
         $rawProvinces = json_decode(file_get_contents(config_path('province.json')), true);
         $province = array_filter($rawProvinces, function ($province) use ($request) {
             return $province['province_code'] === $request->province;
         });
-        $province = reset($province); // Get the first (and only) province if it exists
+        $province = reset($province);
 
         $street = $request->street;
-
         if ($street) {
-            $address = $street . ', ' . $barangay['brgy_name'] . ', ' . $city['city_name'] . ', ' . $province['province_name'];
-        } else {
-            $address = $barangay['brgy_name'] . ', ' . $city['city_name'] . ', ' . $province['province_name'];
+            return $street . ', ' . $barangay['brgy_name'] . ', ' . $city['city_name'] . ', ' . $province['province_name'];
         }
-
-        if ($user->userType == 'user') {
-            DB::transaction(function () use ($validated, $address, $patient) {
-                $this->userModel->updateUserDetails($validated, $address, $patient->user_id);
-                $this->patientModel->updatePatientDetails($validated, $patient->id);
-            });
-        } elseif ($user->userType == 'SuperAdmin') {
-            DB::transaction(function () use ($validated, $address, $provider) {
-                $this->userModel->updateUserDetails($validated, $address, $provider->user_id);
-                $this->providerModel->updateProviderDetails($validated, $provider->id);
-            });
-        } elseif ($user->userType == 'admin') {
-
-            $user = $user->update([
-                'first_name' => $validated['first_name'],
-                'middle_name' => $validated['middle_name'],
-                'last_name' => $validated['last_name'],
-                'address' => $address,
-                'email' => $validated['email']
-            ]);
-        }
-
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
-
-        $user = $request->user()->save();
-
-        if (!$user) {
-            emotify('error', 'Failed to update profile');
-            return redirect()->route('profile.edit');
-        }
-        emotify('success', 'Profile updated successfully');
-        return Redirect::route('profile.edit');
+        return $barangay['brgy_name'] . ', ' . $city['city_name'] . ', ' . $province['province_name'];
     }
 
-    /**
-     * Delete the user's account.
-     */
-    public function destroy(Request $request): RedirectResponse
+    public function updateAvatar(Request $request)
     {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
+        $request->validate([
+            'profile' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
+        $user = auth()->user();
 
+        // Store the uploaded file in the 'profiles' directory on the 'public' disk
+        $path = $request->file('profile')->store('profiles', 'public');
+        $oldProfile = $user->profile;
+
+        if ($oldProfile) {
+            Storage::disk('public')->delete($oldProfile);
+        }
+
+        $user->update(['profile' => $path]);
+
+        emotify('success', 'Avatar is updated');
+        return redirect()->back();
+    }
+
+    public function removeAvatar(Request $request)
+    {
         $user = $request->user();
 
-        Auth::logout();
-
-        $user->delete();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return Redirect::to('/');
+        if ($user->profile) {
+            // Delete the avatar from storage
+            Storage::delete('public/' . $user->profile);
+            // Remove the avatar path from the user record
+            $user->update(['profile' => null]);
+        }
+        emotify('success', 'Avatar removed');
+        return redirect()->back();
     }
 }

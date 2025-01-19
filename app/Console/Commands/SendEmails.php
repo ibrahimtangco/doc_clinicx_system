@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands;
 
+use Log;
 use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Appointment;
+use App\Models\Reservation;
 use Illuminate\Console\Command;
-use App\Notifications\TestNotification;
+use App\Notifications\ReminderAppointment;
 use Illuminate\Support\Facades\Notification;
 
 class SendEmails extends Command
@@ -30,12 +30,26 @@ class SendEmails extends Command
      */
     public function handle()
     {
-        \Log::info("Sending Reminder");
+        \Log::info('Starting to send reminders...');
+        
+        // Get reservations with an 'approved' status for tomorrow
+        $approvedReservations = Reservation::whereDate('date', Carbon::tomorrow())->where('status', 'approved')->get();
 
-        $appointments = Appointment::whereDate('date', Carbon::tomorrow())->get();
+        // Ensure that you only notify unique users
+        $notifiedUsers = [];
 
-        foreach ($appointments as $appointment) {
-            $appointment->user->notify(new AppointmentReminder($appointment));
+        foreach ($approvedReservations as $reservation) {
+            $user = $reservation->patient->user ?? null;
+
+            if ($user && !in_array($user->id, $notifiedUsers)) {
+                // Send the reminder to the user
+                Notification::send($user, new ReminderAppointment($reservation));
+
+                // Add the user ID to the notified list
+                $notifiedUsers[] = $user->id;
+            }
         }
+
+        \Log::info('All reminders have been processed.');
     }
 }

@@ -7,6 +7,7 @@
             'products.index' => 'Are you sure you want to delete this product?',
             'providers.index' => 'Are you sure you want to delete this provider? All data related to this provider will also be deleted',
             'services.index' => 'Are you sure you want to delete this service? All data related to this service will also be deleted.',
+            'unit-types.index' => 'Are you sure you want to delete this unit type? All data related to this service will also be deleted.',
     };
 @endphp
 

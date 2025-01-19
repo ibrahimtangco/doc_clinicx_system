@@ -1,4 +1,5 @@
-<x-master-layout>
+@props(['title'])
+<x-master-layout :title="$title ?? 'DocClinicx'">
 	<div class="min-h-screen bg-gray-100">
 
 		@if (!request()->is('/'))

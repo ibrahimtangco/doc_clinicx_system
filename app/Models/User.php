@@ -2,17 +2,20 @@
 
 namespace App\Models;
 
+use Illuminate\Bus\Queueable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Notifications\CustomEmailVerificationNotification;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
+
+
 
     /**
      * The attributes that are mass assignable.
@@ -20,6 +23,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array<int, string>
      */
     protected $fillable = [
+        'profile',
         'first_name',
         'middle_name',
         'last_name',
@@ -27,6 +31,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'userType',
         'password',
+        'is_active'
     ];
 
     /**
@@ -48,17 +53,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
-    // user and appointment relationship
-    public function appointment()
-    {
-        return $this->hasMany(Appointment::class);
-    }
-
-    public function appointment_history()
-    {
-        return $this->hasMany(AppointmentHistory::class);
-    }
-
     public function patient()
     {
         return $this->hasOne(Patient::class, 'user_id', 'id');
@@ -67,6 +61,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function provider()
     {
         return $this->hasOne(Provider::class, 'user_id', 'id');
+    }
+
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
     }
 
     public function getFullNameAttribute()
@@ -83,6 +82,15 @@ class User extends Authenticatable implements MustVerifyEmail
         }
     }
 
+    public function getInitialAttribute()
+    {
+        $firstInitial = strtoupper(substr($this->first_name, 0, 1));
+        $lastInitial = strtoupper(substr($this->last_name, 0, 1));
+
+        return "$firstInitial$lastInitial";
+    }
+
+
     public function storeUserDetails($validated, $address)
     {
         return User::create([
@@ -91,6 +99,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'last_name' => $validated['last_name'],
             'address' => $address,
             'email' => $validated['email'],
+            'userType' => $validated['userType'],
             'password' => Hash::make($validated['password']),
         ]);
     }

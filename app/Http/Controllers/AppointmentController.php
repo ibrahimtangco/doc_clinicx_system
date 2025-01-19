@@ -2,231 +2,108 @@
 
 namespace App\Http\Controllers;
 
-use Log;
-use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Patient;
-use App\Models\Service;
-use Carbon\CarbonPeriod;
 use App\Models\Appointment;
-use App\Models\BusinessHour;
+use App\Notifications\CompletedAppointment;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Notifications\AppointmentBooked;
-use App\Http\Requests\AppointmentRequest;
-use App\Http\Requests\AppointmentUpdateStatusRequest;
-use App\Models\AppointmentHistory;
-use App\Models\CanceledAppointment;
-use App\Repository\AppointmentRepository;
-use App\Notifications\AppointmentCancelled;
-use App\Notifications\AppointmentCompleted;
-use App\Services\AppointmentService;
-use App\Services\FilterService;
-use Illuminate\Support\Facades\Notification;
+use App\Notifications\NoShowAppointment;
+use Illuminate\Database\Eloquent\Builder;
+
 
 class AppointmentController extends Controller
 {
-    protected $appointmentRepository, $appointmentService, $filterService;
 
-    function __construct(
-        AppointmentRepository $appointmentRepository,
-        AppointmentService $appointmentService,
-        FilterService $filterService
-    ) {
-        $this->appointmentRepository = $appointmentRepository;
-        $this->appointmentService = $appointmentService;
-        $this->filterService = $filterService;
+    // Super admin | Appointment List
+    public function index()
+    {
+        $appointments = Appointment::with(['reservation.user', 'reservation.patient', 'reservation.service'])
+                        ->orderByRaw("CASE 
+                            WHEN status = 'scheduled' THEN 1 
+                            ELSE 2 
+                        END")
+                        ->get();
+
+
+        return view('super_admin.appointments.view', compact('appointments'))->with('title', 'Appointments | View List');
     }
 
-    public function showAppointmentHistory()
+    public function userAppointmentList()
     {
-        // return all appointment with CANCELLED and COMPLETED status
-        $rawAppointments = $this->appointmentRepository->showHistory();
+        $user = auth()->user(); // Get the authenticated user
+        // $appointments = Appointment::with(['reservation.service', 'reservation.patient'])
+        //     ->whereHas('reservation.patient', function ($query) use ($user) {
+        //         $query->where('user_id', $user->id); // Filter patients by the authenticated user's ID
+        //     })
+        //     ->get();
 
-        $userType = auth()->user()->userType;
+        $appointments = Appointment::with(['reservation.service', 'reservation.patient'])
+        ->whereHas('reservation.patient', function (Builder $query) use ($user) {
+            $query->where('user_id', $user->id);
+        })
+        ->join('reservations', 'appointments.reservation_id', '=', 'reservations.id') // Join the reservations table
+        ->orderByRaw("CASE WHEN appointments.status = 'scheduled' THEN 0 ELSE 1 END")
+        ->orderBy('reservations.date', 'desc') // Use reservations.date for ordering
+        ->select('appointments.*') // Ensure only appointment columns are selected
+        ->get();
+    
 
-        $view = match ($userType) {
-            'admin' => 'admin.appointments.history',
-            'SuperAdmin' => 'super_admin.appointments.history',
-        };
+        return view('user.user-appointments', compact('appointments'))->with('title', 'Appointments | View List');
+    }
+    public function indexAdmin()
+    {
+        $appointments = Appointment::with(['reservation.user', 'reservation.patient', 'reservation.service'])->get();
 
-        return view($view, ['appointments' => $rawAppointments]);
+        return view('admin.appointments.view-appointments', compact('appointments'))->with('title', 'Appointments | View List');
     }
 
-    // show users appointments to that user
-    public function showMyAppointments($user_id)
+    // Super admin
+    public function viewAppointmentDetails(Appointment $appointment)
     {
-        // paginate of 5 entries
-        $appointments = $this->appointmentRepository->showUserAppointments($user_id);
-        return view('user.user-appointments', compact('appointments'));
+
+        return view('super_admin.appointments.appointment-details', compact('appointment'))->with('title', 'Appointment | View Details');
     }
 
-    public function show($appointment)
+    public function viewAppointmentDetailsAdmin(Appointment $appointment)
     {
 
-        $appointment = Appointment::findOrFail($appointment);
-        $service = Service::where('id', $appointment->service_id)->firstOrFail();
-        $user = auth()->user();
-        $patient = Patient::where('user_id', $user->id)->firstOrFail();
-        $appointmentInfo = [
-            'service' => $service,
-            'user' => $user,
-            'patient' => $patient,
-            'appointment' => $appointment
-        ];
-
-        // dd($appointmentInfo);
-        return view('user.show', compact('appointmentInfo'));
-    }
-    // display all appointments to admin
-    public function displayAppointments()
-    {
-        //? run this every time booked appointments render to filter out past appointments
-        // $this->appointmentRepository->cancelAllBookInThePast();
-
-        $appointments = Appointment::orderBy('time')->where('status', 'booked')->paginate(10);
-
-        $userType = auth()->user()->userType;
-
-        $view = match ($userType) {
-            'admin' => 'admin.appointments.view',
-            'SuperAdmin' => 'super_admin.appointments.view',
-        };
-
-        return view($view, compact('appointments'));
+        return view('admin.appointments.appointment-details', compact('appointment'))->with('title', 'Appointment | View Details');
     }
 
-    // display time slots to user
-    public function index($service_id)
+    // Update status
+    public function update(Request $request)
     {
-
-        $service = $this->appointmentService->getServiceById($service_id);
-
-        if (!$service) {
-            notify()->error('Service not found');
-            return
-                redirect()->back();
-        }
-        $appointments = $this->appointmentService->getAvailableSlots();
-
-        return view('user.reserve', [
-            'appointments' => $appointments,
-            'service' => $service
+        $validated = $request->validate([
+            'appointment_id' => 'required|exists:appointments,id',
+            'patient_id' => 'required|exists:patients,id',
+            'status' => 'required|in:scheduled,completed,no_show',
+            'remarks' => 'nullable|string|max:75',
+            'write_prescription' => 'sometimes',
         ]);
-    }
 
-    // user store appointment reservation
-    public function reserve(AppointmentRequest $request)
-    {
-        $data = $request->merge(['user_id' => auth()->id()])->toArray();
-        unset($data['service_name']);
-        $appointment = Appointment::create($data);
-        $admin = User::where('userType', 'admin')->get();
-        // Notification::send($admin, new AppointmentBooked($data));
+        $appointment = Appointment::findOrFail($validated['appointment_id']);
 
-        if (!$appointment) {
-            emotify('error', 'Failed to book appointment');
-            return redirect()->route('user.appointments', auth()->user()->id);
+        // Update appointment status and remark
+        $appointment->update([
+            'status' => $validated['status'],
+            'remarks' => $validated['remarks'],
+        ]);
+
+        // Notify patient based on the status
+        if (in_array($validated['status'], ['completed', 'no_show'])) {
+            // Update appointment status and remarks
+            $notificationClass = $validated['status'] === 'completed' ? CompletedAppointment::class : NoShowAppointment::class;
+            $appointment->reservation->patient->user->notify(new $notificationClass($appointment));
         }
-        emotify('success', 'Appointment booked successfully');
-        return redirect()->route('user.appointments', auth()->user()->id);
-    }
 
-    public function edit($appointment)
-    {
-        if (AppointmentHistory::where('id', $appointment)->get()->toArray()) {
-            $appointmentDetails = AppointmentHistory::findOrFail($appointment);
-        } elseif (Appointment::where('id', $appointment)->get()->toArray()) {
-            $appointmentDetails = Appointment::findOrFail($appointment);
-        } else {
-            abort(404, 'Appoitment Not Found');
+        if (isset($validated['write_prescription'])) {
+            $patient = Patient::findOrFail($validated['patient_id']);
+
+            emotify('success', 'Appointment status updated successfully.');
+            return redirect()->route('create.prescription', ['patient' => $patient]);
         }
-        $service = Service::findOrFail($appointmentDetails->service_id);
-        $user = User::findOrFail($appointmentDetails->user_id);
-        $patient = Patient::where('user_id', $appointmentDetails->user_id)->firstOrFail();
 
-        $appointmentInfo = [
-            'service' => $service,
-            'user' => $user,
-            'patient' => $patient,
-            'appointment' => $appointmentDetails
-        ];
-
-        $userType = auth()->user()->userType;
-
-        $view = match ($userType) {
-            'admin' => 'admin.appointments.edit',
-            'SuperAdmin' => 'super_admin.appointments.edit'
-        };
-        return view($view, compact('appointmentInfo'));
-    }
-
-    // admin update the status of appointment
-    public function update(AppointmentUpdateStatusRequest $request, $appointment)
-    {
-        $appointmentToUpdate = Appointment::findOrFail($appointment);
-        $user = User::findOrFail($appointmentToUpdate->user_id);
-
-        $appointment = $appointmentToUpdate->update($request->validated());
-        $appointmentToUpdate->refresh(); // Reload the model from the database
-        $updatedAppointment = $appointmentToUpdate;
-        if ($appointmentToUpdate->status == 'cancelled') {
-            AppointmentHistory::create($updatedAppointment->toArray());
-            // $user->notify(new AppointmentCancelled($updatedAppointment));
-        } else if ($appointmentToUpdate->status == 'completed') {
-            AppointmentHistory::create($updatedAppointment->toArray());
-            // $user->notify(new AppointmentCompleted($updatedAppointment));
-        }
-        $updatedAppointment->delete();
-
-        // $userType = auth()->user()->userType;
-
-        // $route = match ($userType) {
-        //     'admin' => 'admin.appointments.history',
-        //     'SuperAdmin' => 'superadmin.appointments.history'
-        // };
-
-        if (!$appointment) {
-            emotify('error', 'Failed to update appointment status');
-            return redirect()->back();
-        }
-        emotify('success', 'Appointment status updated successfully');
+        emotify('success', 'Appointment status updated successfully.');
         return redirect()->back();
-    }
-
-    // user cancel their appointment
-    public function userCancel($id)
-    {
-        $appointment = $this->appointmentService->getAppointmentById($id);
-
-        $bookingTime = $appointment->created_at;
-        $currentTime = Carbon::now();
-
-        if ($currentTime->diffInMinutes($bookingTime) < 60) {
-            $appointment->update(['status' => 'cancelled']);
-            emotify('error', 'Appointment cancelled successfully');
-            return redirect()->back();
-        } else {
-            return response()->json(['error' => 'You cannot cancel this appointment anymore']);
-        }
-    }
-
-    // admin filter appointments by status
-    public function filterByStatus(Request $request)
-    {
-        $appointments = $this->filterService->filterByStatus($request->query('status'));
-
-        return response()->json($appointments);
-    }
-
-    // admin filter appointments by date
-    public function filterByDate(Request $request)
-    {
-
-        $appointments = $this->filterService->filterByDate(
-            $request->query('dateToFilter')
-        );
-
-        return response()->json($appointments);
     }
 }

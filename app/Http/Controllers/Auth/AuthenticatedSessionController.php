@@ -37,6 +37,14 @@ class AuthenticatedSessionController extends Controller
 
             $user = Auth::user();
 
+            // Check if the user is active
+            if (!$user->is_active) {
+                // Logout the user and redirect them with an error message
+                Auth::logout();
+                return redirect()->back()->withErrors([
+                    'email' => __('Your account is deactivated. Please contact the administrator.'),
+                ]);
+            }
             // Check if the user's email is verified
             if (!$user->hasVerifiedEmail()) {
                 // If email is not verified, send verification notification
@@ -48,13 +56,18 @@ class AuthenticatedSessionController extends Controller
 
             // Check user type and redirect accordingly
             if ($user->userType === 'admin') {
-                return redirect()->route(RouteServiceProvider::ADMIN_DASHBOARD);
-            } elseif ($user->userType === 'SuperAdmin') {
-                return redirect()->route(RouteServiceProvider::SUPER_ADMIN_DASHBOARD);
+                return redirect()->route('admin.dashboard');
+            } elseif ($user->userType === 'superadmin') {
+                return redirect()->route('superadmin.appointments.view');
+            } elseif ($user->userType === 'staff') {
+                return redirect()->route('admin.dashboard');
             }
 
+
+
+
             // Redirect to the intended URL after successful login
-            return redirect()->intended(RouteServiceProvider::HOME);
+            return redirect()->intended('/dashboard');
         }
 
         // If authentication fails, throw validation exception

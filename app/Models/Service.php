@@ -2,20 +2,39 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Activitylog\LogOptions;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Service extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly([
+                'name',
+                'description',
+                'price',
+                'availability',
+            ])
+            ->useLogName('Service')
+            ->logOnlyDirty(); // Log only the changed attributes
+    }
 
     protected $fillable = [
         'name',
         'description',
-        'duration',
         'price',
         'availability'
     ];
+
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+    }
 
     public function getFormattedDurationAttribute()
     {
@@ -36,25 +55,11 @@ class Service extends Model
         return number_format($this->price, 0, '.', ',');
     }
 
-
-    // service and appointment relationship
-    public function appointment()
-    {
-        return $this->hasMany(Appointment::class);
-    }
-
-    public function appointment_history()
-    {
-        return $this->hasMany(AppointmentHistory::class);
-    }
     public function storeServicedetails($validated)
     {
-
         return Service::create([
             'name' => $validated['name'],
             'description' => $validated['description'],
-            'duration' => $validated['duration'],
-            'price' => $validated['price'],
             'availability' =>
             array_key_exists('availability', $validated) ? ($validated['availability'] == true ? 1 : 0) : 0,
         ]);
@@ -67,14 +72,7 @@ class Service extends Model
         return $serviceToUpdate->update([
             'name' => $validated['name'],
             'description' => $validated['description'],
-            'duration' => $validated['duration'],
-            'price' => $validated['price'],
             'availability' => array_key_exists('availability', $validated) ? ($validated['availability'] == true ? 1 : 0) : 0,
         ]);
-    }
-
-    public function deleteService($service)
-    {
-        return $service->delete();
     }
 }

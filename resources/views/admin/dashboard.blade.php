@@ -1,33 +1,262 @@
-<x-admin-layout>
-<x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
+<x-admin-layout :title="$title">
+	<x-slot name="header">
+		<h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+			{{ __('Dashboard') }}
+		</h2>
+	</x-slot>
 
-    <div class="p-6">
-        <div class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            <a href="{{ route('patients.index') }}">
-                <div class="hover:bg-primary/10 transition-colors bg-white p-6 shadow-sm rounded-lg col-span-1 flex flex-col gap-2">
-                <div class="bg-primary text-white rounded-full w-14 h-14 flex items-center justify-center ">
-                    <?xml version="1.0" ?><!DOCTYPE svg  PUBLIC '-//W3C//DTD SVG 1.0//EN'  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'><svg fill="currentColor" height="30px" width="30px" enable-background="new 0 0 24 24" id="Layer_1" version="1.0" viewBox="0 0 24 24" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g><path d="M9,9c0-1.7,1.3-3,3-3s3,1.3,3,3c0,1.7-1.3,3-3,3S9,10.7,9,9z M12,14c-4.6,0-6,3.3-6,3.3V19h12v-1.7C18,17.3,16.6,14,12,14z   "/></g><g><g><circle cx="18.5" cy="8.5" r="2.5"/></g><g><path d="M18.5,13c-1.2,0-2.1,0.3-2.8,0.8c2.3,1.1,3.2,3,3.2,3.2l0,0.1H23v-1.3C23,15.7,21.9,13,18.5,13z"/></g></g><g><g><circle cx="18.5" cy="8.5" r="2.5"/></g><g><path d="M18.5,13c-1.2,0-2.1,0.3-2.8,0.8c2.3,1.1,3.2,3,3.2,3.2l0,0.1H23v-1.3C23,15.7,21.9,13,18.5,13z"/></g></g><g><g><circle cx="5.5" cy="8.5" r="2.5"/></g><g><path d="M5.5,13c1.2,0,2.1,0.3,2.8,0.8c-2.3,1.1-3.2,3-3.2,3.2l0,0.1H1v-1.3C1,15.7,2.1,13,5.5,13z"/></g></g></svg>
-                </div>
-                <p class="text-text-desc font-semibold">Total Patients</p>
-                <p class="text-4xl font-bold">{{ $totalPatients }}</p>
-            </div>
-            </a>
+	<div class="p-6">
+		<!-- Stats Cards -->
+		<div class="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+			<!-- Total Patients -->
+			<a href="{{ route('patients.index') }}">
+				<div class="hover:bg-primary/10 transition-colors bg-white p-6 shadow-sm rounded-lg col-span-1 flex gap-4">
+					<div class="bg-primary text-white rounded-full w-14 h-14 flex items-center justify-center">
+						<i class="fa-solid fa-users text-xl"></i>
+					</div>
+					<div>
+						<p class="text-text-desc font-semibold">Total Patients</p>
+						<p class="text-2xl font-bold">{{ $totalPatients }}</p>
+					</div>
+				</div>
+			</a>
 
-            <a href="{{ route('admin.appointments.view') }}">
-                <div class="hover:bg-purple-100 transition-colors bg-white p-6 shadow-sm rounded-lg col-span-1 flex flex-col gap-2">
-                <div class="bg-purple-800 text-white rounded-full w-14 h-14 flex items-center justify-center ">
-                   <?xml version="1.0" ?><svg height="26" fill="currentColor" viewBox="0 0 24 24" width="26" xmlns="http://www.w3.org/2000/svg"><path d="M11,14 L11,11 L13,11 L13,14 L16,14 L16,16 L13,16 L13,19 L11,19 L11,16 L8,16 L8,14 L11,14 Z M20,8 L20,5 L18,5 L18,6 L16,6 L16,5 L8,5 L8,6 L6,6 L6,5 L4,5 L4,8 L20,8 Z M20,10 L4,10 L4,20 L20,20 L20,10 Z M18,3 L20,3 C21.1045695,3 22,3.8954305 22,5 L22,20 C22,21.1045695 21.1045695,22 20,22 L4,22 C2.8954305,22 2,21.1045695 2,20 L2,5 C2,3.8954305 2.8954305,3 4,3 L6,3 L6,2 L8,2 L8,3 L16,3 L16,2 L18,2 L18,3 Z" fill-rule="evenodd"/></svg>
-                </div>
-                <p class="text-text-desc font-semibold">Total Appointments</p>
-                <p class="text-4xl font-bold">{{ $totalAppointments }}</p>
-            </div>
-            </a>
+			<!-- Total Appointments -->
+			<a href="{{ route('admin.appointments.view') }}">
+				<div class="hover:bg-purple-100 transition-colors bg-white p-6 shadow-sm rounded-lg col-span-1 flex gap-4">
+					<div class="bg-purple-800 text-white rounded-full w-14 h-14 flex items-center justify-center">
+						<i class="fa-solid fa-calendar-check text-xl"></i>
+					</div>
+					<div>
+						<p class="text-text-desc font-semibold">Scheduled Appointments</p>
+						<p class="text-2xl font-bold">{{ $totalAppointments }}</p>
+					</div>
+				</div>
+			</a>
 
+			<!-- Pending Reservations -->
+			<a href="{{ route('admin.reservation.list') }}">
+				<div class="hover:bg-yellow-100 transition-colors bg-white p-6 shadow-sm rounded-lg col-span-1 flex gap-4">
+					<div class="bg-yellow-500 text-white rounded-full w-14 h-14 flex items-center justify-center">
+						<i class="fa-solid fa-hourglass-half text-xl"></i>
+					</div>
+					<div>
+						<p class="text-text-desc font-semibold">Pending Reservations</p>
+						<p class="text-2xl font-bold">{{ $pendingReservations }}</p>
+					</div>
+				</div>
+			</a>
 
-        </div>
-    </div>
-</x-admin>
+			<!-- Prescription Count -->
+			<a href="{{ route('admin.prescriptions.index') }}">
+				<div class="hover:bg-blue-100 transition-colors bg-white p-6 shadow-sm rounded-lg col-span-1 flex gap-4">
+					<div class="bg-blue-500 text-white rounded-full w-14 h-14 flex items-center justify-center">
+						<i class="fa-solid fa-file-prescription text-xl"></i>
+					</div>
+					<div>
+						<p class="text-text-desc font-semibold">Prescriptions</p>
+						<p class="text-2xl font-bold">{{ $totalPrescriptions }}</p>
+					</div>
+				</div>
+			</a>
+
+			<!-- Transaction Count -->
+			<a href="{{ route('transactions.index') }}">
+				<div class="hover:bg-green-100 transition-colors bg-white p-6 shadow-sm rounded-lg col-span-1 flex gap-4">
+					<div class="bg-green-500 text-white rounded-full w-14 h-14 flex items-center justify-center">
+						<i class="fa-solid fa-exchange-alt text-xl"></i>
+					</div>
+					<div>
+						<p class="text-text-desc font-semibold">Transactions</p>
+						<p class="text-2xl font-bold">{{ $totalTransactions }}</p>
+					</div>
+				</div>
+			</a>
+		</div>
+
+		<!-- Appointment Trends Graph -->
+		<div class="mt-8 grid sm:grid-cols-1 md:grid-cols-2 gap-6">
+			<!-- Appointment Trends -->
+			<div class="bg-white p-6 shadow-sm rounded-lg overflow-x-auto">
+				<div class="flex justify-end">
+					<div class="mb-4 flex gap-2 items-center">
+						<label class="block text-gray-700 font-medium text-sm" for="trend-selector">View Trends:</label>
+						<select class="block w-full border-gray-300 rounded-md text-text-desc" id="trend-selector"
+							onchange="updateChart(this.value)">
+							<option value="daily">Daily</option>
+							<option value="weekly">Weekly</option>
+							<option value="monthly">Monthly</option>
+						</select>
+					</div>
+				</div>
+				<h3 class="text-lg font-semibold text-gray-800 mb-4">Appointment Trends</h3>
+				<canvas id="appointment-trends-chart"></canvas>
+			</div>
+
+			<!-- Product Sales Chart -->
+			<div class="bg-white p-6 shadow-sm rounded-lg overflow-x-auto">
+				<h3 class="text-lg font-semibold text-gray-800 mb-4">Product Sales</h3>
+				<canvas id="product-sales-chart"></canvas>
+			</div>
+		</div>
+
+		<!-- Upcoming Appointments Section -->
+		<div class="mt-6 bg-white shadow rounded-lg overflow-hidden">
+			<a href="{{ route('admin.appointments.view') }}">
+				<h3 class="text-lg font-medium text-gray-900 p-6"><span class="hover:underline">Upcoming Appointments</span></h3>
+			</a>
+			<div class="overflow-x-auto">
+				<table class="min-w-full bg-white">
+					<thead class="text-xs text-primary-text uppercase bg-gray-50 font-semibold">
+						<tr>
+							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Patient Name</th>
+							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Service</th>
+							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+							<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+						</tr>
+					</thead>
+					<tbody>
+						@if ($upcomingAppointments->isNotEmpty())
+							@foreach ($upcomingAppointments as $appointment)
+								<tr>
+									<td class="px-6 py-4 text-sm text-gray-900">{{ $appointment->reservation->patient->user->full_name }}</td>
+									<td class="px-6 py-4 text-sm text-gray-900">{{ $appointment->reservation->service->name }}</td>
+									<td class="px-6 py-4 text-sm text-gray-500">
+										{{ Carbon\Carbon::parse($appointment->reservation->date)->format('F j, Y') }}</td>
+									<td class="px-6 py-4 text-sm text-green-600">{{ $appointment->status }}</td>
+								</tr>
+							@endforeach
+						@else
+							<td class="text-center text-sm text-text-desc py-4" colspan="4">No upcoming appointments</td>
+						@endif
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+	<!-- Add Products -->
+
+	<script>
+		const productSalesCtx = document.getElementById('product-sales-chart').getContext('2d');
+		new Chart(productSalesCtx, {
+			type: 'bar',
+			data: {
+				labels: @json($productNames),
+				datasets: [{
+						label: 'Total Sales Amount',
+						data: @json($salesAmounts),
+						backgroundColor: 'rgb(63, 131, 248, 0.6)', // Green for sales
+						borderColor: 'rgb(63, 131, 248)',
+						borderWidth: 2,
+						stack: 'sales'
+					},
+					{
+						label: 'Quantity Sold',
+						data: @json($quantities),
+						type: 'line',
+						borderColor: '#FF5733', // Orange for quantity
+						borderWidth: 2,
+						backgroundColor: 'rgba(255, 87, 51, 0.3)',
+						tension: 0.4,
+						fill: false,
+						yAxisID: 'y2' // To create a secondary axis
+					}
+				]
+			},
+			options: {
+				responsive: true,
+				scales: {
+					x: {
+						stacked: false,
+						title: {
+							display: true,
+							text: 'Product Name'
+						}
+					},
+					y: {
+						title: {
+							display: true,
+							text: 'Total Sales Amount'
+						},
+						beginAtZero: true
+					},
+					y2: {
+						type: 'linear',
+						display: true,
+						position: 'right',
+						title: {
+							display: true,
+							text: 'Quantity Sold'
+						},
+						grid: {
+							drawOnChartArea: false // Hide grid lines for the secondary axis
+						}
+					}
+				}
+			}
+		});
+	</script>
+
+	<script>
+		// This function will fetch data based on the selected trend and update the chart
+		function updateChart(view) {
+			fetch(`/get-appointment-trends?view=${view}`)
+				.then(response => response.json())
+				.then(data => {
+					const appointmentTrendsCtx = document.getElementById('appointment-trends-chart').getContext('2d');
+
+					// Check if the chart instance already exists
+					if (window.appointmentTrendsChart) {
+						// Update the existing chart with new data
+						window.appointmentTrendsChart.data.labels = data.labels;
+						window.appointmentTrendsChart.data.datasets[0].data = data.data;
+						window.appointmentTrendsChart.update();
+					} else {
+						// Create a new chart instance if it doesn't exist
+						window.appointmentTrendsChart = new Chart(appointmentTrendsCtx, {
+							type: 'line',
+							data: {
+								labels: data.labels,
+								datasets: [{
+									label: 'Appointments',
+									data: data.data,
+									borderColor: '#7e22ce',
+									backgroundColor: '#d8b4fe',
+									borderWidth: 2,
+									tension: 0.4 // Smooth line
+								}]
+							},
+							options: {
+								responsive: true,
+								scales: {
+									x: {
+										title: {
+											display: true,
+											text: 'Date'
+										}
+									},
+									y: {
+										title: {
+											display: true,
+											text: 'Number of Appointments'
+										},
+										beginAtZero: true
+									}
+								}
+							}
+						});
+					}
+				})
+				.catch(error => console.error('Error fetching data:', error));
+		}
+
+		// Initialize the chart with default data (e.g., 'daily') on page load
+		document.addEventListener('DOMContentLoaded', () => {
+			updateChart('daily');
+		});
+	</script>
+
+</x-admin-layout>

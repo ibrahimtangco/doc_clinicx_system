@@ -9,24 +9,21 @@ use App\Models\Barangay;
 use App\Models\Province;
 use Illuminate\Http\Request;
 use App\Services\AddressService;
-use App\Services\PatientService;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\RedirectResponse;
+use Spatie\Browsershot\Browsershot;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Requests\PatientStoreRequest;
 use App\Http\Requests\UpdatePatientRequest;
 
 class PatientController extends Controller
 {
+    protected $addressService, $patientModel, $userModel;
 
-    protected $addressService, $patientModel, $userModel, $patientService;
-
-    public function __construct(AddressService $addressService, PatientService $patientService)
+    public function __construct(AddressService $addressService, Patient $patientModel, User $userModel)
     {
         $this->addressService = $addressService;
-        $this->patientService = $patientService;
-        $this->patientModel = new Patient();
-        $this->userModel = new User();
+        $this->patientModel = $patientModel;
+        $this->userModel = $userModel;
     }
 
     /**
@@ -35,13 +32,16 @@ class PatientController extends Controller
     public function index()
     {
         $patients = Patient::paginate(10);
+        $userType = auth()->user()->userType;
 
-        $view = match (auth()->user()->userType) {
+        $view = match ($userType) {
             'admin' => 'admin.patients.index',
-            'SuperAdmin' => 'super_admin.patients.index'
+            'staff' => 'admin.patients.index',
+            'superadmin' => 'super_admin.patients.index'
         };
 
-        return view($view, compact('patients'));
+        return view($view, compact('patients'))
+            ->with('title', 'Patients | View List');
     }
 
     /**
@@ -49,69 +49,25 @@ class PatientController extends Controller
      */
     public function create()
     {
-        $provinces = json_decode(file_get_contents(config_path('province.json')), true);
-
-        $view = match (auth()->user()->userType) {
-            'admin' => 'admin.patients.create',
-            'SuperAdmin' => 'super_admin.patients.create'
-        };
-
-        return view($view, compact('provinces'));
+        $provinces = $this->getCachedData('provinces', 'province.json', 'province_code', 'province_name');
+        return view('admin.patients.create', compact('provinces'))
+            ->with('title', 'Patients | Create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(PatientStoreRequest $request): RedirectResponse
+    public function store(PatientStoreRequest $request)
     {
         $validated = $request->validated();
 
-        // Fetch barangay name
-        $barangayData = json_decode(file_get_contents(config_path('barangay.json')), true);
-        $barangayCode = $validated['barangay'];
-        $barangay = null;
-        foreach ($barangayData as $item) {
-            if ($item['brgy_code'] === $barangayCode) {
-                $barangay = $item;
-                break;
-            }
-        }
-
-        // Fetch city name
-        $citiesData = json_decode(file_get_contents(config_path('cities.json')), true);
-        $cityCode = $validated['city'];
-        $city = null;
-        foreach ($citiesData as $item) {
-            if ($item['city_code'] === $cityCode) {
-                $city = $item;
-                break;
-            }
-        }
-
-        // Fetch province name
-        $provinceData = json_decode(file_get_contents(config_path('province.json')), true);
-        $provinceCode = $validated['province'];
-        $province = null;
-        foreach ($provinceData as $item) {
-            if ($item['province_code'] === $provinceCode) {
-                $province = $item;
-                break;
-            }
-        }
-
-        $street = $request->street;
-
-        if ($street) {
-            $address = $street . ', ' . $barangay['brgy_name'] . ', ' . $city['city_name'] . ', ' . $province['province_name'];
-        } else {
-            $address =
-                $barangay['brgy_name'] . ', ' . $city['city_name'] . ', ' . $province['province_name'];
-        }
-
+        // Build Address
+        $address = $this->buildAddress($validated);
         DB::transaction(function () use ($validated, $address) {
             $user = $this->userModel->storeUserDetails($validated, $address);
             $this->patientModel->storePatientDetails($user->id, $validated);
         });
+
         emotify('success', 'Patient created successfully');
         return redirect()->route('patients.index');
     }
@@ -125,43 +81,13 @@ class PatientController extends Controller
         $currentAddress = $patient->user->address;
         $modifiedAddress = $this->addressService->getAddress($currentAddress);
 
-        // Helper function to fetch data from JSON file and cache it
-        function getCachedData($cacheKey, $jsonFile, $codeKey, $nameKey, $whereClause = null)
-        {
-            return Cache::remember($cacheKey, 60 * 60, function () use ($jsonFile, $codeKey, $nameKey, $whereClause) {
-                $jsonData = json_decode(file_get_contents(config_path($jsonFile)), true);
+        // Fetch data
+        $provinces = $this->getCachedData('provinces', 'province.json', 'province_code', 'province_name');
+        $cities = $this->getCachedData("cities_{$modifiedAddress['province_code']}", 'cities.json', 'city_code', 'city_name', ['province_code' => $modifiedAddress['province_code']]);
+        $barangays = $this->getCachedData("barangays_{$modifiedAddress['city_code']}", 'barangay.json', 'brgy_code', 'brgy_name', ['city_code' => $modifiedAddress['city_code']]);
 
-                if (isset($whereClause['province_code'])) {
-                    // Filter data based on whereClause
-                    $filteredData = collect($jsonData)->where('province_code', $whereClause['province_code'])->pluck($nameKey, $codeKey)->toArray();
-                    return $filteredData;
-                } elseif (isset($whereClause['city_code'])) {
-                    // Filter data based on whereClause
-                    $filteredData = collect($jsonData)->where('city_code', $whereClause['city_code'])->pluck($nameKey, $codeKey)->toArray();
-                    return $filteredData;
-                }
-
-                // Return all data if no whereClause is provided
-                return collect($jsonData)->pluck($nameKey, $codeKey)->toArray();
-            });
-        }
-
-
-        // Usage in your code
-        // Fetch provinces
-        $provinces = getCachedData('provinces', 'province.json', 'province_code', 'province_name');
-
-        // Fetch cities based on province_code
-        $cities = getCachedData("cities_{$modifiedAddress['province_code']}", 'cities.json', 'city_code', 'city_name', ['province_code' => $modifiedAddress['province_code']]);
-
-        // Fetch barangays based on city_code
-        $barangays = getCachedData("barangays_{$modifiedAddress['city_code']}", 'barangay.json', 'brgy_code', 'brgy_name', ['city_code' => $modifiedAddress['city_code']]);
-
-        $view = match (auth()->user()->userType) {
-            'admin' => 'admin.patients.edit',
-            'SuperAdmin' => 'super_admin.patients.edit'
-        };
-        return view($view, compact('user', 'provinces', 'cities', 'barangays', 'modifiedAddress'));
+        return view('admin.patients.edit', compact('user', 'provinces', 'cities', 'barangays', 'modifiedAddress'))
+            ->with('title', 'Patient | Update Information');
     }
 
     /**
@@ -169,64 +95,73 @@ class PatientController extends Controller
      */
     public function update(UpdatePatientRequest $request, Patient $patient)
     {
-
         $validated = $request->validated();
 
-        // Fetch barangay name from 'barangay.json'
-        $barangay = collect(json_decode(file_get_contents(config_path('barangay.json')), true))
-            ->where('brgy_code', $validated['barangay'])
-            ->pluck('brgy_name')
-            ->first();
-
-        // Fetch city name from 'cities.json'
-        $city = collect(json_decode(file_get_contents(config_path('cities.json')), true))
-            ->where('city_code', $validated['city'])
-            ->pluck('city_name')
-            ->first();
-
-        // Fetch province name from 'province.json'
-        $province = collect(json_decode(file_get_contents(config_path('province.json')), true))
-            ->where('province_code', $validated['province'])
-            ->pluck('province_name')
-            ->first();
-
-        $street = $validated['street'];
-
-        if ($street) {
-            $address = $street . ', ' . $barangay . ', ' . $city . ', ' . $province;
-        } else {
-            $address = $barangay . ', ' . $city . ', ' . $province;
-        }
+        // Build Address
+        $address = $this->buildAddress($validated);
 
         DB::transaction(function () use ($validated, $address, $patient) {
             $this->userModel->updateUserDetails($validated, $address, $patient->user_id);
             $this->patientModel->updatePatientDetails($validated, $patient->id);
         });
-        emotify('success', 'Patiend information has been updated');
+
+        emotify('success', 'Patient information has been updated');
         return redirect()->route('patients.index');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Helper method to get cached data.
      */
-    public function destroy(Patient $patient)
+    private function getCachedData($cacheKey, $jsonFile, $codeKey, $nameKey, $whereClause = null)
     {
-        $user = User::where('id', $patient->user_id)->first();
-        $result = $user->delete();
+        return Cache::remember($cacheKey, 60 * 60, function () use ($jsonFile, $codeKey, $nameKey, $whereClause) {
+            $jsonData = json_decode(file_get_contents(config_path($jsonFile)), true);
 
-        if (!$result) {
-            emotify('errpr', 'Failed to delete patient');
-            return redirect()->route('patients.index');
-        }
-        emotify('success', 'Patient deleted successfully');
-        return redirect()->route('patients.index');
+            if ($whereClause) {
+                $filteredData = collect($jsonData)->where(array_keys($whereClause)[0], array_values($whereClause)[0])->pluck($nameKey, $codeKey)->toArray();
+                return $filteredData;
+            }
+            return collect($jsonData)->pluck($nameKey, $codeKey)->toArray();
+        });
     }
 
-    public function search(Request $request)
+    /**
+     * Helper method to build the full address from the validated data.
+     */
+    private function buildAddress($validated)
     {
-        $users = $this->patientModel->searchPatient($request->search);
-        $searchDisplay = $this->patientService->searchResults($users);
+        $street = $validated['street'] ?? '';
+        $barangay = $this->getCachedData('barangays', 'barangay.json', 'brgy_code', 'brgy_name')[$validated['barangay']] ?? '';
+        $city = $this->getCachedData('cities', 'cities.json', 'city_code', 'city_name')[$validated['city']] ?? '';
+        $province = $this->getCachedData('provinces', 'province.json', 'province_code', 'province_name')[$validated['province']] ?? '';
 
-        return response($searchDisplay);
+        return $street ? "{$street}, {$barangay}, {$city}, {$province}" : "{$barangay}, {$city}, {$province}";
+    }
+
+    public function downloadPatientList()
+    {
+        $patients = Patient::all();
+        if ($patients->isEmpty()) {
+            emotify('error', 'There are no registered patients.');
+            return redirect()->back();
+        }
+        
+        $path = public_path('images/FILARCA.png');
+        $type = pathinfo($path, PATHINFO_EXTENSION);
+        $data = file_get_contents($path);
+        $src = 'data:image/' . $type . ';base64,' . base64_encode($data);
+
+        $html = view('reports_template.patient_list', [
+            'imageSrc' => $src,
+            'patients' => $patients,
+        ])->render();
+        $pdfPath = public_path('FR_patient_list.pdf');
+
+        Browsershot::html($html)
+        ->margins(15.4, 15.4, 15.4, 15.4)
+        ->showBackground()
+        ->save($pdfPath);
+
+        return response()->download($pdfPath)->deleteFileAfterSend(true);
     }
 }

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('condition');
             $table->text('description')->nullable();
             $table->date('diagnosed_date');
-            $table->string('treatement')->nullable();
+            $table->string('treatment')->nullable();
             $table->string('status');
             $table->timestamps();
         });

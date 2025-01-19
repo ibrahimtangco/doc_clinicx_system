@@ -1,4 +1,4 @@
-<x-admin-layout>
+<x-admin-layout :title="$title">
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
 			<a href="{{ route('providers.index') }}">{{ __('Dentists') }}</a>
@@ -7,9 +7,9 @@
 
 	{{-- main container --}}
 	<div class="py-12">
-		<div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 			<div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-				<div class="max-w-xl">
+				<div class="max-w-xl mx-auto md:mx-0">
 					<section>
 						<header>
 							<h2 class="text-lg font-medium text-gray-900">
@@ -27,7 +27,7 @@
 							<x-form-create :provinces="$provinces" />
 
 							<div class="flex items-center gap-4">
-								<x-primary-button>{{ __('Create') }}</x-primary-button>
+								<x-primary-button class="w-full md:w-fit">{{ __('Create') }}</x-primary-button>
 
 							</div>
 						</form>
@@ -37,6 +37,11 @@
 			</div>
 		</div>
 	</div>
-
+	<script>
+		// Fetch old values from Blade template if they exist
+		var oldProvince = "{{ old('province') }}";
+		var oldCity = "{{ old('city') }}";
+		var oldBarangay = "{{ old('barangay') }}";
+	</script>
 	<script src="{{ asset('js/register_address_handler.js') }}"></script>
 </x-admin-layout>

@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-guest-layout :title="$title ?? 'DocClinicx'">
     <form method="POST" action="{{ route('password.store') }}" class="w-full max-w-md bg-white p-6 rounded-lg mt-6">
         @csrf
 

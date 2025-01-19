@@ -24,10 +24,12 @@ class UpdateProductRequest extends FormRequest
         return [
             'name' => 'required|string|max:150',
             'category_id' => 'required|exists:categories,id',
-            'description' => 'nullable|string',
+            'unit_type_id' => 'required|exists:unit_types,id',
+            'description' => 'required|string|max:255',
             'quantity' => 'required|numeric',
             'buying_price' => 'required|decimal:2,4',
-            'selling_price' => 'required|decimal:2,4'
+            'selling_price' => 'required|decimal:2,4',
+            'status' => 'sometimes'
         ];
     }
 }

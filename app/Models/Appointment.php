@@ -2,51 +2,40 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use App\Services\AppointmentFormatterService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Appointment extends Model
 {
     use HasFactory;
 
-    protected $casts = [
-        'time' => 'datetime:H:i'
+    protected $fillable = [
+        'reservation_id',
+        'queue_number',
+        'status',
+        'remarks'
     ];
 
-    protected $guarded = [];
+    public function reservation()
+    {
+        return $this->belongsTo(Reservation::class);
+    }
 
-    //* RELATIONSHIPS
-
-    // user and appointmetn relationship
+    // Access user through reservation
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->reservation->user();
     }
-    // service and appointmetn relationship
+
+    // Access patient through reservation
+    public function patient()
+    {
+        return $this->reservation->patient();
+    }
+
+    // Access service through reservation
     public function service()
     {
-        return $this->belongsTo(Service::class);
-    }
-
-    //* ACCESSORS
-    public function getFormattedDateAttribute()
-    {
-        return AppointmentFormatterService::getFormattedDate($this->attributes['date']);
-    }
-
-    public function getFormattedTimeAttribute()
-    {
-        return AppointmentFormatterService::getFormattedTime($this->attributes['time']);
-    }
-
-    public function getFormattedDurationAttribute()
-    {
-        return AppointmentFormatterService::getFormattedDuration($this->attributes['duration']);
-    }
-
-    public function canBeCancelled()
-    {
-        return $this->status != 'cancelled' && now()->diffInMinutes($this->created_at) < 60;
+        return $this->reservation->service();
     }
 }

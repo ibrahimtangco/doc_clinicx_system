@@ -22,12 +22,12 @@ class UpdateMedicalHistoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id' => 'required',
-            'condition' => 'required|string|max:255',
-            'diagnosed_date' => 'required|date',
-            'treatment' => 'nullable|string',
-            'status' => 'required|string',
-            'description' => 'nullable|string'
+            'edit_id' => 'required|exists:medical_history,id',
+            'edit_condition' => 'required|string|max:255',
+            'edit_diagnosed_date' => 'required|date',
+            'edit_treatment' => 'nullable|string',
+            'edit_status' => 'required|string',
+            'edit_description' => 'nullable|string'
         ];
     }
 }

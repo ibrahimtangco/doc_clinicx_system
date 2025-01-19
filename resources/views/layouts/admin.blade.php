@@ -1,5 +1,5 @@
-<x-master-layout>
-
+@props(['title'])
+<x-master-layout :title="$title">
 	<!-- ===== Page Wrapper Start ===== -->
 	<div class="flex h-screen overflow-y-hidden bg-gray-100 overflow-x-auto">
 		<!-- ===== Sidebar Start ===== -->

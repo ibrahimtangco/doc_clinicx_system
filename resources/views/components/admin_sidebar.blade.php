@@ -2,9 +2,9 @@
 	class="fixed left-0 z-30 top-0 h-screen hide-scrollbar overflow-y-scroll w-64 bg-[#1C2434] text-white-text flex flex-col gap-6 duration-300 ease-linear lg:static lg:translate-x-0">
 	{{-- LOGO START --}}
 	<div class="flex items-center justify-between pr-6 py-4 mb-4">
-		<a class="flex items-center" href="{{ url('admin/') }}">
-			<img alt="" class="w-20" src="{{ asset('images/LOGO_ICON.png') }}">
-			<div class="font-logo text-4xl -ml-2">DocClinicx</div>
+		<a class="flex items-center gap-2" href="{{ url('/') }}">
+			<img alt="" class="w-14 ml-2" src="{{ asset('images/FILARCA.png') }}">
+			<div class="font-serif text-2xl -ml-2 mt-2 text-nowrap">Filarca-Rabena</div>
 		</a>
 		<div
 			class="h-10 w-10 cursor-pointer block rounded-full p-2 lg:hidden hover:bg-gray-200 hover:text-primary-text ease-linear duration-100">
@@ -24,50 +24,33 @@
 	{{-- MENU START --}}
 	<div class="flex flex-col gap-2 px-6 mb-2">
 		<h2 class="font-medium text-white-text/75 mb-4">MENU</h2>
-		<ul class="font-medium space-y-1" x-data="{ isOpenProduct: false, isOpenCategory: false }">
+		<ul class="font-medium space-y-1" x-data="{ isOpenProduct: false, isOpenCategory: false, isOpenUnitType: false }">
 			<li
 				class="cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('admin.dashboard') ? 'bg-white/10' : '' }}">
 				<div class="flex items-center gap-2">
-					<?xml version="1.0" ?><svg baseProfile="tiny" fill="currentColor" height="21px" id="Layer_1" version="1.2"
-						viewBox="0 0 24 24" width="21px" xml:space="preserve" xmlns:xlink="http://www.w3.org/1999/xlink"
-						xmlns="http://www.w3.org/2000/svg">
-						<path
-							d="M12,3c0,0-6.186,5.34-9.643,8.232C2.104,11.416,2,11.684,2,12c0,0.553,0.447,1,1,1h2v7c0,0.553,0.447,1,1,1h3  c0.553,0,1-0.448,1-1v-4h4v4c0,0.552,0.447,1,1,1h3c0.553,0,1-0.447,1-1v-7h2c0.553,0,1-0.447,1-1c0-0.316-0.104-0.584-0.383-0.768  C18.184,8.34,12,3,12,3z" />
-					</svg>
+					<i class="fa-solid fa-house"></i>
 					<a href="{{ route('admin.dashboard') }}">Dashboard</a>
 				</div>
 			</li>
-            <li
-				class="cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('prescriptions.create') ? 'bg-white/10' : '' }}">
+			<li
+				class="cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('admin.prescriptions.index') ? 'bg-white/10' : '' }}">
 				<div class="flex items-center gap-2">
-			<?xml version="1.0" ?><svg viewBox="0 0 384 512" width="19" height="19" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M176 240H128v32h48C184.9 272 192 264.9 192 256S184.9 240 176 240zM256 0v128h128L256 0zM224 128L224 0H48C21.49 0 0 21.49 0 48v416C0 490.5 21.49 512 48 512h288c26.51 0 48-21.49 48-48V160h-127.1C238.3 160 224 145.7 224 128zM292.5 315.5l11.38 11.25c6.25 6.25 6.25 16.38 0 22.62l-29.88 30L304 409.4c6.25 6.25 6.25 16.38 0 22.62l-11.25 11.38c-6.25 6.25-16.5 6.25-22.75 0L240 413.3l-30 30c-6.249 6.25-16.48 6.266-22.73 .0156L176 432c-6.25-6.25-6.25-16.38 0-22.62l29.1-30.12L146.8 320H128l.0078 48.01c0 8.875-7.125 16-16 16L96 384c-8.875 0-16-7.125-16-16v-160C80 199.1 87.13 192 96 192h80c35.38 0 64 28.62 64 64c0 24.25-13.62 45-33.5 55.88L240 345.4l29.88-29.88C276.1 309.3 286.3 309.3 292.5 315.5z"/></svg>
+					<i class="fa-solid fa-prescription"></i>
 					<a href="{{ route('admin.prescriptions.index') }}">Prescription</a>
+				</div>
+			</li>
+			<li
+				class="cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('transactions.index') ? 'bg-white/10' : '' }}">
+				<div class="flex items-center gap-2">
+					<i class="fa-solid fa-cart-shopping"></i>
+					<a href="{{ route('transactions.index') }}">Transaction</a>
 				</div>
 			</li>
 			<li @click="isOpenCategory = !isOpenCategory" class="">
 				<button
 					class="flex w-full items-center justify-between cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200">
 					<div class="flex gap-2 items-center">
-						<?xml version="1.0" ?><svg fill="currentColor" height="21" id="icon" viewBox="0 0 32 32" width="21"
-							xmlns="http://www.w3.org/2000/svg">
-							<defs>
-								<style>
-									.cls-1 {
-										fill: none;
-									}
-								</style>
-							</defs>
-							<title />
-							<rect height="2" width="14" x="16" y="8" />
-							<rect height="2" width="14" x="16" y="22" />
-							<path
-								d="M10,14H4a2.0023,2.0023,0,0,1-2-2V6A2.0023,2.0023,0,0,1,4,4h6a2.0023,2.0023,0,0,1,2,2v6A2.0023,2.0023,0,0,1,10,14ZM4,6v6h6.0012L10,6Z" />
-							<path
-								d="M10,28H4a2.0023,2.0023,0,0,1-2-2V20a2.0023,2.0023,0,0,1,2-2h6a2.0023,2.0023,0,0,1,2,2v6A2.0023,2.0023,0,0,1,10,28ZM4,20v6h6.0012L10,20Z" />
-							<rect class="cls-1" data-name="&lt;Transparent Rectangle&gt;" height="21" id="_Transparent_Rectangle_"
-								width="21" />
-						</svg>
-
+						<i class="fa-solid fa-list"></i>
 						<span>Category</span>
 					</div>
 					{{-- arrow --}}
@@ -81,25 +64,51 @@
 					</svg>
 				</button>
 				<div class="pl-6 space-y-1" x-show="isOpenCategory">
-					<a class="flex w-full items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('categories.index') ? 'bg-white/10' : '' }}"
+					<a
+						class="flex w-full items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('categories.index') ? 'bg-white/10' : '' }}"
 						href="{{ route('categories.index') }}">
-						<?xml version="1.0" ?><svg class="bi bi-eye-fill" fill="currentColor" height="19px" viewBox="0 0 16 16"
-							width="19px" xmlns="http://www.w3.org/2000/svg">
-							<path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z" />
-							<path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" />
-						</svg>
-
+						<i class="fa-solid fa-eye"></i>
 						<span>View Category</span>
 					</a>
-					<a class="flex w-full items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('categories.create') ? 'bg-white/10' : '' }}"
+					<a
+						class="flex w-full items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('categories.create') ? 'bg-white/10' : '' }}"
 						href="{{ route('categories.create') }}">
-						<svg fill="currentColor" height="19px" id="Layer_1" style="enable-background:new 0 0 512 512;" version="1.1"
-							viewBox="0 0 512 512" width="19px" xml:space="preserve" xmlns:xlink="http://www.w3.org/1999/xlink"
-							xmlns="http://www.w3.org/2000/svg">
-							<path
-								d="M417.4,224H288V94.6c0-16.9-14.3-30.6-32-30.6c-17.7,0-32,13.7-32,30.6V224H94.6C77.7,224,64,238.3,64,256  c0,17.7,13.7,32,30.6,32H224v129.4c0,16.9,14.3,30.6,32,30.6c17.7,0,32-13.7,32-30.6V288h129.4c16.9,0,30.6-14.3,30.6-32  C448,238.3,434.3,224,417.4,224z" />
-						</svg>
+						<i class="fa-solid fa-plus"></i>
 						<span>Add Category</span>
+					</a>
+				</div>
+			</li>
+
+			<li @click="isOpenUnitType = !isOpenUnitType" class="">
+				<button
+					class="flex w-full items-center justify-between cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200">
+					<div class="flex gap-2 items-center">
+						<i class="fa-solid fa-weight-scale"></i>
+						<span class="text-nowrap">Unit of Meas.</span>
+					</div>
+					{{-- arrow --}}
+					<svg fill="currentColor" height="20px" id="Layer_1" style="enable-background:new 0 0 512 512;" version="1.1"
+						viewBox="0 0 512 512" width="20px" xml:space="preserve" xmlns:xlink="http://www.w3.org/1999/xlink"
+						xmlns="http://www.w3.org/2000/svg">
+						<path
+							x-bind:d="isOpenUnitType ?
+							    'M413.1,327.3l-1.8-2.1l-136-106.5c-4.6-5.3-11.5-8.6-19.2-8.6c-7.7,0-14.6,3.4-19.2,8.6L101,324.9l-2.3,2.6  C97,330,96,333,96,336.2c0,8.7,7.4,10.8,16.6,10.8v0h286.8v0c9.2,0,16.6-7.1,16.6-10.8C416,332.9,414.9,329.8,413.1,327.3z' :
+							    'M98.9,184.7l1.8,2.1l136,106.5c4.6,5.3,11.5,8.6,19.2,8.6c7.7,0,14.6-3.4,19.2-8.6L411,187.1l2.3-2.6  c1.7-2.5,2.7-5.5,2.7-8.7c0-8.7-7.4-10.8-16.6-10.8v0H112.6v0c-9.2,0-16.6,7.1-16.6,10.8C96,179.1,97.1,182.2,98.9,184.7z'" />
+					</svg>
+				</button>
+				<div class="pl-6 space-y-1" x-show="isOpenUnitType">
+					<a
+						class="flex w-full items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('unit-types.index') ? 'bg-white/10' : '' }}"
+						href="{{ route('unit-types.index') }}">
+						<i class="fa-solid fa-eye"></i>
+
+						<span>View All Meas.</span>
+					</a>
+					<a
+						class="flex w-full items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('categories.create') ? 'bg-white/10' : '' }}"
+						href="{{ route('unit-types.create') }}">
+						<i class="fa-solid fa-plus"></i>
+						<span>Add Meas.</span>
 					</a>
 				</div>
 			</li>
@@ -108,21 +117,14 @@
 				<button
 					class="flex w-full items-center justify-between cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200">
 					<div class="flex gap-2 items-center">
-						<?xml version="1.0" ?><svg class="feather feather-box" fill="none" height="20" stroke-linecap="round"
-							stroke-linejoin="round" stroke-width="2" stroke="currentColor" viewBox="0 0 24 24" width="20"
-							xmlns="http://www.w3.org/2000/svg">
-							<path
-								d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-							<polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-							<line x1="12" x2="12" y1="22.08" y2="12" />
-						</svg>
+						<i class="fa-solid fa-capsules"></i>
 
 						<span>Product</span>
 					</div>
 					{{-- arrow --}}
-					<svg fill="currentColor" height="20px" id="Layer_1" style="enable-background:new 0 0 512 512;"
-						version="1.1" viewBox="0 0 512 512" width="20px" xml:space="preserve"
-						xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+					<svg fill="currentColor" height="20px" id="Layer_1" style="enable-background:new 0 0 512 512;" version="1.1"
+						viewBox="0 0 512 512" width="20px" xml:space="preserve" xmlns:xlink="http://www.w3.org/1999/xlink"
+						xmlns="http://www.w3.org/2000/svg">
 						<path
 							x-bind:d="isOpenProduct ?
 							    'M413.1,327.3l-1.8-2.1l-136-106.5c-4.6-5.3-11.5-8.6-19.2-8.6c-7.7,0-14.6,3.4-19.2,8.6L101,324.9l-2.3,2.6  C97,330,96,333,96,336.2c0,8.7,7.4,10.8,16.6,10.8v0h286.8v0c9.2,0,16.6-7.1,16.6-10.8C416,332.9,414.9,329.8,413.1,327.3z' :
@@ -130,24 +132,17 @@
 					</svg>
 				</button>
 				<div class="pl-6 space-y-1" x-show="isOpenProduct">
-					<a class="flex w-full items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('products.index') ? 'bg-white/10' : '' }}"
+					<a
+						class="flex w-full items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('products.index') ? 'bg-white/10' : '' }}"
 						href="{{ route('products.index') }}">
-						<?xml version="1.0" ?><svg class="bi bi-eye-fill" fill="currentColor" height="19px" viewBox="0 0 16 16"
-							width="19px" xmlns="http://www.w3.org/2000/svg">
-							<path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z" />
-							<path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" />
-						</svg>
+						<i class="fa-solid fa-eye"></i>
 
 						<span>View Products</span>
 					</a>
-					<a class="flex w-full items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('products.create') ? 'bg-white/10' : '' }}"
+					<a
+						class="flex w-full items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('products.create') ? 'bg-white/10' : '' }}"
 						href="{{ route('products.create') }}">
-						<svg fill="currentColor" height="19px" id="Layer_1" style="enable-background:new 0 0 512 512;"
-							version="1.1" viewBox="0 0 512 512" width="19px" xml:space="preserve"
-							xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
-							<path
-								d="M417.4,224H288V94.6c0-16.9-14.3-30.6-32-30.6c-17.7,0-32,13.7-32,30.6V224H94.6C77.7,224,64,238.3,64,256  c0,17.7,13.7,32,30.6,32H224v129.4c0,16.9,14.3,30.6,32,30.6c17.7,0,32-13.7,32-30.6V288h129.4c16.9,0,30.6-14.3,30.6-32  C448,238.3,434.3,224,417.4,224z" />
-						</svg>
+						<i class="fa-solid fa-plus"></i>
 						<span>Add Product</span>
 					</a>
 				</div>
@@ -155,39 +150,6 @@
 
 		</ul>
 	</div>
-
-	{{-- <div class="flex flex-col gap-2 px-6 mb-2">
-		<h2 class="text-white-text/75 font-medium mb-2">MENU</h2>
-		<ul class="font-medium space-y-1">
-			<li
-				class="cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('admin.dashboard') ? 'bg-white/10' : '' }}">
-				<div class="flex items-center gap-2">
-					<?xml version="1.0" ?><svg baseProfile="tiny" fill="currentColor" height="21px" id="Layer_1" version="1.2"
-						viewBox="0 0 24 24" width="21px" xml:space="preserve" xmlns:xlink="http://www.w3.org/1999/xlink"
-						xmlns="http://www.w3.org/2000/svg">
-						<path
-							d="M12,3c0,0-6.186,5.34-9.643,8.232C2.104,11.416,2,11.684,2,12c0,0.553,0.447,1,1,1h2v7c0,0.553,0.447,1,1,1h3  c0.553,0,1-0.448,1-1v-4h4v4c0,0.552,0.447,1,1,1h3c0.553,0,1-0.447,1-1v-7h2c0.553,0,1-0.447,1-1c0-0.316-0.104-0.584-0.383-0.768  C18.184,8.34,12,3,12,3z" />
-					</svg>
-					<a href="{{ route('admin.dashboard') }}">Dashboard</a>
-				</div>
-			</li>
-
-			<li class="cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('admin.inventory') ? 'bg-white/10' : '' }}">
-				<a class="flex gap-2 items-center" href="{{ route('admin.inventory') }}">
-					<?xml version="1.0" ?><svg fill="currentColor" height="19px" viewBox="0 0 24 24" width="19px"
-						xmlns="http://www.w3.org/2000/svg">
-						<title />
-						<g id="archieve">
-							<path
-								d="M22,2H2A1,1,0,0,0,1,3V21a1,1,0,0,0,1,1H22a1,1,0,0,0,1-1V3A1,1,0,0,0,22,2ZM3,14V10H9a1,1,0,0,0,1,1h4a1,1,0,0,0,1-1h6v4ZM3,4H9a1,1,0,0,0,1,1h4a1,1,0,0,0,1-1h6V8H3ZM21,20H3V16H9a1,1,0,0,0,1,1h4a1,1,0,0,0,1-1h6Z" />
-						</g>
-					</svg>
-					<span>Inventory</span>
-				</a>
-			</li>
-
-		</ul>
-	</div> --}}
 	{{-- MENU END --}}
 
 	{{-- ACTIONS START --}}
@@ -198,35 +160,39 @@
 	<div class="flex flex-col gap-2 px-6 mb-2">
 		<h2 class="text-white-text/75 font-medium mb-2">OTHERS</h2>
 		<ul class="font-medium space-y-1">
-
-            <li class="cursor-pointer hover:bg-white/10 p-2  rounded-sm ease-in-out duration-200 {{ request()->routeIs('admin.inventory') ? 'bg-white/10' : '' }}">
+			@if (auth()->user()->userType === 'admin')
+				<li
+					class="cursor-pointer hover:bg-white/10 p-2  rounded-sm ease-in-out duration-200 {{ request()->routeIs('accounts.index') ? 'bg-white/10' : '' }}">
+					<a class="flex gap-2 items-center" href="{{ route('accounts.index') }}">
+						<i class="fa-solid fa-circle-user"></i>
+						<span class="ml-2">Accounts</span>
+					</a>
+				</li>
+				<li
+					class="cursor-pointer hover:bg-white/10 p-2  rounded-sm ease-in-out duration-200 {{ request()->routeIs('display.activity.logs') ? 'bg-white/10' : '' }}">
+					<a class="flex gap-2 items-center" href="{{ route('display.activity.logs') }}">
+						<i class="fa-solid fa-history"></i>
+						<span class="ml-2">Audit Trail</span>
+					</a>
+				</li>
+			@endif
+			<li
+				class="cursor-pointer hover:bg-white/10 p-2  rounded-sm ease-in-out duration-200 {{ request()->routeIs('admin.settings') ? 'bg-white/10' : '' }}">
 				<a class="flex gap-2 items-center" href="{{ route('admin.settings') }}">
-					<?xml version="1.0" ?><svg height="20" version="1.1" viewBox="0 0 20 20" width="20"  xmlns="http://www.w3.org/2000/svg" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns" xmlns:xlink="http://www.w3.org/1999/xlink"><title/><desc/><defs/><g fill="none" fill-rule="evenodd" id="Page-1" stroke="none" stroke-width="1"><g class="fill-current" id="Core" transform="translate(-464.000000, -380.000000)"><g id="settings" transform="translate(464.000000, 380.000000)"><path d="M17.4,11 C17.4,10.7 17.5,10.4 17.5,10 C17.5,9.6 17.5,9.3 17.4,9 L19.5,7.3 C19.7,7.1 19.7,6.9 19.6,6.7 L17.6,3.2 C17.5,3.1 17.3,3 17,3.1 L14.5,4.1 C14,3.7 13.4,3.4 12.8,3.1 L12.4,0.5 C12.5,0.2 12.2,0 12,0 L8,0 C7.8,0 7.5,0.2 7.5,0.4 L7.1,3.1 C6.5,3.3 6,3.7 5.4,4.1 L3,3.1 C2.7,3 2.5,3.1 2.3,3.3 L0.3,6.8 C0.2,6.9 0.3,7.2 0.5,7.4 L2.6,9 C2.6,9.3 2.5,9.6 2.5,10 C2.5,10.4 2.5,10.7 2.6,11 L0.5,12.7 C0.3,12.9 0.3,13.1 0.4,13.3 L2.4,16.8 C2.5,16.9 2.7,17 3,16.9 L5.5,15.9 C6,16.3 6.6,16.6 7.2,16.9 L7.6,19.5 C7.6,19.7 7.8,19.9 8.1,19.9 L12.1,19.9 C12.3,19.9 12.6,19.7 12.6,19.5 L13,16.9 C13.6,16.6 14.2,16.3 14.7,15.9 L17.2,16.9 C17.4,17 17.7,16.9 17.8,16.7 L19.8,13.2 C19.9,13 19.9,12.7 19.7,12.6 L17.4,11 L17.4,11 Z M10,13.5 C8.1,13.5 6.5,11.9 6.5,10 C6.5,8.1 8.1,6.5 10,6.5 C11.9,6.5 13.5,8.1 13.5,10 C13.5,11.9 11.9,13.5 10,13.5 L10,13.5 Z" id="Shape"/></g></g></g></svg>
+					<i class="fa-solid fa-gear"></i>
 					<span class="ml-2">Settings</span>
 				</a>
 			</li>
-			<li
-				class="cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('admin.patients') ? 'bg-white/10' : '' }}">
-				<form method="POST" action="{{ route('logout') }}" >
-                    @csrf
-                    <a
-						class="flex items-center gap-3.5 text-sm font-medium"
-                        href="route('logout')"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();"
-                        >
-						<svg class="fill-current" fill="none" height="22" viewBox="0 0 22 22" width="22"
-							xmlns="http://www.w3.org/2000/svg">
-							<path
-								d="M15.5375 0.618744H11.6531C10.7594 0.618744 10.0031 1.37499 10.0031 2.26874V4.64062C10.0031 5.05312 10.3469 5.39687 10.7594 5.39687C11.1719 5.39687 11.55 5.05312 11.55 4.64062V2.23437C11.55 2.16562 11.5844 2.13124 11.6531 2.13124H15.5375C16.3625 2.13124 17.0156 2.78437 17.0156 3.60937V18.3562C17.0156 19.1812 16.3625 19.8344 15.5375 19.8344H11.6531C11.5844 19.8344 11.55 19.8 11.55 19.7312V17.3594C11.55 16.9469 11.2062 16.6031 10.7594 16.6031C10.3125 16.6031 10.0031 16.9469 10.0031 17.3594V19.7312C10.0031 20.625 10.7594 21.3812 11.6531 21.3812H15.5375C17.2219 21.3812 18.5625 20.0062 18.5625 18.3562V3.64374C18.5625 1.95937 17.1875 0.618744 15.5375 0.618744Z"
-								fill="" />
-							<path
-								d="M6.05001 11.7563H12.2031C12.6156 11.7563 12.9594 11.4125 12.9594 11C12.9594 10.5875 12.6156 10.2438 12.2031 10.2438H6.08439L8.21564 8.07813C8.52501 7.76875 8.52501 7.2875 8.21564 6.97812C7.90626 6.66875 7.42501 6.66875 7.11564 6.97812L3.67814 10.4844C3.36876 10.7938 3.36876 11.275 3.67814 11.5844L7.11564 15.0906C7.25314 15.2281 7.45939 15.3312 7.66564 15.3312C7.87189 15.3312 8.04376 15.2625 8.21564 15.125C8.52501 14.8156 8.52501 14.3344 8.21564 14.025L6.05001 11.7563Z"
-								fill="" />
-						</svg>
+			<li class="cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200">
+				<form action="{{ route('logout') }}" method="POST">
+					@csrf
+					<a class="flex items-center gap-3.5 text-sm font-medium" href="route('logout')"
+						onclick="event.preventDefault();
+                                        this.closest('form').submit();">
+						<i class="fa-solid fa-right-from-bracket rotate-180"></i>
 						Log Out
 					</a>
-                </form>
+				</form>
 			</li>
 
 		</ul>

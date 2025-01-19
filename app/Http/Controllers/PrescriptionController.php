@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Log;
 use App\Models\Patient;
+use App\Models\Provider;
 use App\Models\Prescription;
 use Illuminate\Http\Request;
 use App\Http\Requests\StorePrescriptionRequest;
@@ -22,10 +23,11 @@ class PrescriptionController extends Controller
 
         $view = match ($userType) {
             'admin' => 'admin.prescription.index',
-            'SuperAdmin' => 'super_admin.prescription.index'
+            'staff' => 'admin.prescription.index',
+            'superadmin' => 'super_admin.prescription.index'
         };
 
-        return view($view, compact('prescriptions'));
+        return view($view, compact('prescriptions'))->with('title', 'Prescriptions | View List');
     }
 
     /**
@@ -37,10 +39,10 @@ class PrescriptionController extends Controller
 
         $view = match ($userType) {
             'admin' => 'admin.prescription.create',
-            'SuperAdmin' => 'super_admin.prescription.create'
+            'superadmin' => 'super_admin.prescription.create'
         };
 
-        return view($view, ['patient' => $patient]);
+        return view($view, ['patient' => $patient])->with('title', 'Prescription | Write Prescription');
     }
 
     /**
@@ -59,8 +61,16 @@ class PrescriptionController extends Controller
             array_push($dosages, $item['dosage']);
         }
 
+        $provider = Provider::where('user_id', auth()->user()->id)->first();
+
+        if (!$provider) {
+            emotify('error', 'Something went wrong. Try again later');
+            return redirect()->back();
+        }
+
         $prescription = Prescription::create([
             'patient_id' => $validated['patient_id'],
+            'provider_id' => $provider->id,
             'medicines' => $medicines,
             'quantities' => $quantities,
             'dosages' => $dosages,
@@ -70,7 +80,8 @@ class PrescriptionController extends Controller
 
         $route = match ($userType) {
             'admin' => 'admin.prescriptions.index',
-            'SuperAdmin' => 'superadmin.prescriptions.index'
+            'staff' => 'admin.prescriptions.index',
+            'superadmin' => 'superadmin.prescriptions.index'
         };
 
         if (!$prescription) {
@@ -90,8 +101,9 @@ class PrescriptionController extends Controller
 
         $view = match ($userType) {
             'admin' => 'admin.prescription.print_preview',
-            'SuperAdmin' => 'superadmin.prescription.print_preview'
+            'staff' => 'admin.prescription.print_preview',
+            'superadmin' => 'superadmin.prescription.print_preview'
         };
-        return view($view, ['prescription' => $prescription]);
+        return view($view, ['prescription' => $prescription])->with('title', 'Prescription | View as PDF');
     }
 }

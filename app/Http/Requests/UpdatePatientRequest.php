@@ -25,17 +25,17 @@ class UpdatePatientRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => ['required', 'string', 'max:255'],
-            'middle_name' => ['max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'telephone' => ['required', 'string', 'min:11', 'max:255'],
-            'birthday' => ['required', 'date'],
-            'age' => ['required', 'integer'],
+            'first_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZÀ-ÖØ-öø-ÿ\s\'-]+$/'],
+            'middle_name' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-ZÀ-ÖØ-öø-ÿ\s\'-]+$/'],
+            'last_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZÀ-ÖØ-öø-ÿ\s\'-]+$/'],
+            'telephone' => ['required', 'string', 'regex:/^(?:\+63\s?|0)9\d{2}[\s\-]?\d{3}[\s\-]?\d{4}$/'],
+            'birthday' => ['required', 'date', 'date_format:Y-m-d'],
+            'age' => ['required', 'integer', 'min:1'],
             'province' => ['required', 'string', 'max:255'],
             'city' => ['required', 'string', 'max:255'],
             'barangay' => ['required', 'string', 'max:255'],
-            'street' => ['max:255'],
-            'status' => ['required', 'max:255'],
+            'street' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z0-9\s,.-]+$/'],
+            'status' => ['required', 'in:Single,Married,Annulled,Widowed,Separated,Others'],
             'email' => [
                 'sometimes',
                 'string',
@@ -45,9 +45,22 @@ class UpdatePatientRequest extends FormRequest
                 'email' => [
                     'required',
                     'email',
-                    Rule::unique('users')->ignore($this->route('patient')->id, 'id') // Ignore the current provider's email
+                    Rule::unique('users')->ignore($this->patient->user_id)
                 ]
             ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'first_name.regex' => 'The first name can only contain letters, spaces, hyphens, and apostrophes.',
+            'last_name.regex' => 'The last name can only contain letters, spaces, hyphens, and apostrophes.',
+            'telephone.required' => 'The phone number is required.',
+            'telephone.regex' => 'The telephone number must be a valid Philippine mobile number.',
+            'email.unique' => 'This email address is already registered.',
+            'password.min' => 'Use 8 characters or more for your password.',
+            'password.regex' => 'Use 8 or more characters with a mix of letters, numbers, and symbols.',
         ];
     }
 }

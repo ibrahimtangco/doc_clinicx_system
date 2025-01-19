@@ -10,7 +10,7 @@ class FooterController extends Controller
     public function update(Request $request, Footer $footer)
     {
         $validated = $request->validate([
-            'description' => 'string|max:100'
+            'description' => 'string|max:100|min:20'
         ]);
 
         $result = $footer->update($validated);

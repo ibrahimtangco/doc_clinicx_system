@@ -1,127 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-	<meta charset="UTF-8">
-	<meta content="width=device-width, initial-scale=1.0" name="viewport">
-	<meta content="ie=edge" http-equiv="X-UA-Compatible">
-	<title>{{ $prescription->patient->user->full_name }} Prescription</title>
-
-	<style>
-        * {
-            font-size: 18px;
-            font-family: sans-serif;
-        }
-        .wrapper {
-            height: 100vh;
-            width: 100%;
-        }
-        .rx-logo {
-            font-size: 25px;
-            font-weight: bold;
-            padding: 1rem 0;
-            font-style: italic;
-        }
-        header {
-            text-align: center;
-            border-bottom: 1px solid black;
-            padding: 10px 0;
-        }
-        header h1 {
-            font-size: 25px;
-        }
-        header p {
-            font-size: 18px;
-        }
-        main {
-            position: relative;
-            max-width: 90%;
-            margin: 0 auto;
-            padding: 1rem 0;
-        }
-
-        main .date {
-            position: absolute;
-            right: 0;
-            padding: 5px 0;
-        }
-        main .patient-info > *{
-            padding: 5px 0;
-        }
-        main .prescription-list {
-            padding-bottom: 1.5rem;
-        }
-        main .prescription-list .quantity, main .prescription-list .dosage {
-            margin-left: 20px;
-        }
-        main .prescription-list .quantity {
-            margin-top: 5px;
-            margin-bottom: 5px;
-        }
-        .line {
-            border: .5px solid black;
-            width: 150%;
-            margin-left: -2rem;
-            margin-bottom: 5px;
-        }
-        footer {
-            max-width: 90%;
-            margin: 0 auto;
-            text-align: center
-        }
-        footer .footer-container {
-            position: relative;
-            margin-top: 5rem;
-        }
-        footer .footer-container .footer {
-            position: absolute;
-            right: 0
-        }
-	</style>
-</head>
-
-<body>
-	<div class="wrapper">
-		<div>
-			<header>
-				<h1>FILARCA-RABENA-CORPUZ DENTAL <br>CLINIC AND DENTAL SUPPLY</h1>
-				<p>113 Salcedo Street, City of Vigan, Philippines</p>
-			</header>
-			<main>
-				<div class="date">
-					<div>Date: {{ date('F d, Y', strtotime(date('Y-m-d'))) }}</div>
+<x-master-layout title="Prescription | View as PDF">
+	<div class="">
+		<div class="max-w-3xl mx-auto bg-white rounded-lg">
+			<header class="flex justify-between items-center mb-6">
+				<div class="flex-1 text-left">
+					<h1 class="text-2xl font-bold">Filarca-Rabena Dental Clinic</h1>
+					<p class="text-sm">113 Salcedo St. Brgy 3, Vigan City, Ilocos Sur, Philippines 2700.</p>
+					<p class="text-sm">Clinic Hours: Monday - Saturday 8am - 6pm | Sunday: By Appointment</p>
 				</div>
-				<div class="patient-info">
-					<div>Patient Name: {{ $prescription->patient->user->full_name }}</div>
-					<div>Address: {{ $prescription->patient->user->address }}</div>
-					<div>Age: {{ $prescription->patient->age }}</div>
+				<div class="flex-none">
+					<img alt="Clinic Logo" class="w-24 h-24 object-contain" src="{{ $imageSrc }}">
+					{{-- <img alt="Clinic Logo" class="w-24 h-24 object-contain" src="{{ asset('images/DocClinicx.png') }}"> --}}
+				</div>
+			</header>
+
+			<div class="border-b border-gray-300 mb-6"></div>
+
+			<div class="mb-6">
+				<h2 class="text-xl font-semibold">Prescription</h2>
+				<p class="text-sm">Date: {{ date('F j, Y') }}</p>
+			</div>
+
+			<div class="mb-6">
+				<h3 class="font-bold">Patient Information:</h3>
+				<p>Name: <span class="font-medium">{{ $prescription->patient->user->full_name }}</span></p>
+				<p>Age: <span class="font-medium">{{ $prescription->patient->age }}</span></p>
+				<p>Address: <span class="font-medium">{{ $prescription->patient->user->address }}</span></p>
+			</div>
+
+			<div class="mb-6">
+				<h3 class="font-bold">Medication Details:</h3>
+				<table class="min-w-full border-collapse border border-gray-300">
+					<thead>
+						<tr>
+							<th class="border border-gray-300 px-4 py-2 text-left">Medication</th>
+							<th class="border border-gray-300 px-4 py-2 text-left w-fit">Quantity</th>
+							<th class="border border-gray-300 px-4 py-2 text-left">Dosage</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach ($prescription->medicines as $index => $medicine)
+							<tr class="hover:bg-gray-100">
+								<td class="border border-gray-300 px-4 py-2">{{ $medicine }}</td>
+								<td class="border border-gray-300 px-4 py-2">{{ $prescription->quantities[$index] }}</td>
+								<td class="border border-gray-300 px-4 py-2">{{ $prescription->dosages[$index] }}</td>
+							</tr>
+						@endforeach
+
+					</tbody>
+				</table>
+			</div>
+
+			<div class="mb-6">
+				<h3 class="font-bold">Instructions:</h3>
+				<p class="text-sm">Take the medications as prescribed. Contact the clinic if you experience any side effects.</p>
+			</div>
+
+			<footer class="flex justify-between items-center mt-12">
+				<div>
+
+					<p class="text-sm">Doctor: Dr. {{ $prescription->provider->user->full_name }}</p>
+					<p class="text-sm">Reg. No: {{ $prescription->provider->reg_number }}</p>
 				</div>
 				<div>
-					<div class="rx-logo">
-						Rx
-					</div>
-					<div>
-						@foreach ($prescription->medicines as $index => $medicine)
-							<div class="prescription-list">
-								<div>{{ $index + 1 }}) {{ $medicine }}</div>
-								<div class="quantity">Quantity(pcs): {{ $prescription->quantities[$index] }}</div>
-								<div class="dosage">Dosage: {{ $prescription->dosages[$index] }}</div>
-							</div>
-						@endforeach
-					</div>
+					<p class="text-sm">Signature:</p>
+					<p class="text-xs">____________________</p>
 				</div>
-			</main>
-
+			</footer>
 		</div>
-		<footer>
-			<div class="footer-container">
-				<div class="footer">
-					<div class="line"></div>
-					<div>{{ auth()->user()->full_name }}</div>
-				</div>
-			</div>
-		</footer>
-	</div>
-</body>
 
-</html>
+	</div>
+</x-master-layout>

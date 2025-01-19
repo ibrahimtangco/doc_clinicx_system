@@ -36,14 +36,23 @@ class MedicalHistory extends Model
         return MedicalHistory::create($data);
     }
 
-    public function updateMedicalHistory($data, $patient)
+    public function updateMedicalHistory($data)
     {
-        $medicalHistory = MedicalHistory::where('patient_id', $patient->id)
-            ->where('id', $data['id'])
-            ->first();
-        unset($data['id']);
+        $id = $data['edit_id'];
 
-        return $medicalHistory->update($data);
+        $medicalHistory = MedicalHistory::find($id);
+        if ($medicalHistory) {
+            $medicalHistory->update([
+                'condition' => $data['edit_condition'],
+                'diagnosed_date' => $data['edit_diagnosed_date'],
+                'treatment' => $data['edit_treatment'],
+                'status' => $data['edit_status'],
+                'description' => $data['edit_description']
+            ]);
+            $medicalHistory->save();
+            return true; // Indicate success
+        }
+        return false; // Indicate failure if not found
     }
 
     public function showUserMedicalHistory($patient)

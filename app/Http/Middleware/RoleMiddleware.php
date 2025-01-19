@@ -13,11 +13,18 @@ class RoleMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, $role): Response
+
+
+    public function handle(Request $request, Closure $next, $roles): Response
     {
-        if (!$request->user() || $request->user()->userType !== $role) {
-            return back();
+        $rolesArray = array_map('trim', explode('|', strtolower($roles)));
+
+        $user = $request->user();
+
+        if (!$user || !in_array(strtolower($user->userType), $rolesArray)) {
+            return redirect()->back()->withErrors(['Unauthorized access']);
         }
+
         return $next($request);
     }
 }

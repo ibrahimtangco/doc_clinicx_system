@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout :title="$title">
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
 			<a href="{{ route('superadmin.prescriptions.index') }}">{{ __('Prescription') }}</a>
@@ -22,7 +22,6 @@
 
 						<form action="{{ route('superadmin.prescriptions.store') }}" class="mt-6 space-y-6" id="myForm" method="post">
 							@csrf
-
 							<table class="w-full text-sm text-left rtl:text-right text-gray-500">
 								<thead class="text-xs text-gray-700 uppercase bg-gray-50 border">
 									<tr>
@@ -62,7 +61,7 @@
 							</table>
 
 							<div class="flex items-center gap-4">
-								<x-primary-button id="open-modal">{{ __('Create') }}</x-primary-button>
+								<x-primary-button>{{ __('Create') }}</x-primary-button>
 							</div>
 						</form>
 					</section>

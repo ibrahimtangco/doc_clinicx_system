@@ -9,13 +9,15 @@ use App\Models\Barangay;
 use App\Models\Province;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\RegisteredUserRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Cache;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use App\Http\Requests\RegisteredUserRequest;
 
 class RegisteredUserController extends Controller
 {
@@ -24,8 +26,8 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        $provinces = json_decode(file_get_contents(config_path('province.json')), true);
-        return view('auth.register', compact('provinces'));
+        $provinces = $this->getCachedData('provinces', 'province.json', 'province_code', 'province_name');
+        return view('auth.register', compact('provinces'))->with('title', 'Create Account');
     }
 
     /**
@@ -33,7 +35,7 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(RegisteredUserRequest $request): RedirectResponse
+    public function store(RegisteredUserRequest $request)
     {
         // Fetch barangay name from 'barangay.json'
         $barangayName = collect(json_decode(file_get_contents(config_path('barangay.json')), true))
@@ -59,31 +61,31 @@ class RegisteredUserController extends Controller
             'province' => $provinceName
         ];
 
-
         if (in_array(null, $locationDetails, true)) {
-            return response()->json(['error' => 'Invalid location details provided.'], 400);
+            emotify('error', 'Something wrong with the location. Refresh the page and try again');
+            return redirect()->back();
         }
 
         $street = $request->street;
         $address = $street ? "$street, {$locationDetails['barangay']}, {$locationDetails['city']}, {$locationDetails['province']}" : "{$locationDetails['barangay']}, {$locationDetails['city']}, {$locationDetails['province']}";
+        DB::transaction(function () use ($request, $address, &$user) {
+            $user = User::create([
+                'first_name' => $request->first_name,
+                'middle_name' => $request->middle_name,
+                'last_name' => $request->last_name,
+                'address' => $address,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
 
-        $user = User::create([
-            'first_name' => $request->first_name,
-            'middle_name' => $request->middle_name,
-            'last_name' => $request->last_name,
-            'address' => $address,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        $patient = Patient::create([
-            'user_id' => $user->id,
-            'telephone' => $request->telephone,
-            'birthday' => $request->birthday,
-            'age' => $request->age,
-            'status' => $request->status
-        ]);
-
+            Patient::create([
+                'user_id' => $user->id,
+                'telephone' => $request->telephone,
+                'birthday' => $request->birthday,
+                'age' => $request->age,
+                'status' => $request->status
+            ]);
+        });
         $user->sendEmailVerificationNotification();
         Auth::login($user);
 
@@ -93,9 +95,7 @@ class RegisteredUserController extends Controller
     public function fetchCity(Request $request)
     {
         $province_code = $request->province_code;
-
         $cities = json_decode(file_get_contents(config_path('cities.json')), true);
-        // $data['cities'] = City::where('province_code', $request->province_code)->get();
 
         $filteredCities['cities'] = array_filter($cities, function ($city) use ($province_code) {
             return $city['province_code'] === $province_code;
@@ -117,5 +117,18 @@ class RegisteredUserController extends Controller
         // $data['barangay'] = Barangay::where('city_code', $request->city_code)->get();
 
         return response()->json($filteredBarangay);
+    }
+
+    private function getCachedData($cacheKey, $jsonFile, $codeKey, $nameKey, $whereClause = null)
+    {
+        return Cache::remember($cacheKey, 60 * 60, function () use ($jsonFile, $codeKey, $nameKey, $whereClause) {
+            $jsonData = json_decode(file_get_contents(config_path($jsonFile)), true);
+
+            if ($whereClause) {
+                $filteredData = collect($jsonData)->where(array_keys($whereClause)[0], array_values($whereClause)[0])->pluck($nameKey, $codeKey)->toArray();
+                return $filteredData;
+            }
+            return collect($jsonData)->pluck($nameKey, $codeKey)->toArray();
+        });
     }
 }

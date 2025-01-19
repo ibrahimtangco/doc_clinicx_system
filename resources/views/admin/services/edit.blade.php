@@ -1,4 +1,4 @@
-<x-admin-layout>
+<x-admin-layout :title="$title">
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
 			<a href="{{ route('services.index') }}">{{ __('Services') }}</a>
@@ -7,9 +7,9 @@
 
 	{{-- main container --}}
 	<div class="py-12">
-		<div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 			<div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-				<div class="max-w-xl">
+				<div class="max-w-xl mx-auto md:mx-0">
 					<section>
 						<header>
 							<h2 class="text-lg font-medium text-gray-900">
@@ -33,20 +33,6 @@
 								<x-input-error :messages="$errors->get('name')" class="mt-2" />
 							</div>
 
-							<div>
-								<x-input-label :value="__('Price in Peso')" for="price" />
-								<x-text-input :value="old('price')" :value="$service->price" autocomplete="price" autofocus class="block mt-1 w-full"
-									id="price" name="price" type="text" />
-								<x-input-error :messages="$errors->get('price')" class="mt-2" />
-							</div>
-
-							<div>
-								<x-input-label :value="__('Duration in Minutes')" for="duration" />
-								<x-text-input :value="old('duration')" :value="$service->duration" autocomplete="duration" autofocus class="block mt-1 w-full"
-									id="duration" name="duration" type="text" />
-								<x-input-error :messages="$errors->get('price')" class="mt-2" />
-							</div>
-
 							<div class="mt-4">
 								<x-input-label :value="__('Description')" for="email" />
 								<textarea class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full mt-1"
@@ -62,7 +48,7 @@
 							</div>
 
 							<div class="flex items-center gap-4">
-								<x-primary-button>{{ __('Update') }}</x-primary-button>
+								<x-primary-button class="w-full md:w-fit">{{ __('Update') }}</x-primary-button>
 
 							</div>
 						</form>
@@ -72,4 +58,6 @@
 			</div>
 		</div>
 	</div>
+    <script src="{{ asset('js/formatDecimal.js') }}"></script>
 </x-admin-layout>
+

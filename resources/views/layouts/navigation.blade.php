@@ -5,14 +5,13 @@
 			<div class="flex">
 				<!-- Logo -->
 				<div class="shrink-0 flex items-center">
-					<a class="flex items-center" href="{{ url('/') }}">
-						<img alt="" class="w-20 -ml-3" src="{{ asset('images/LOGO_ICON.png') }}">
-						<span class="-ml-1 font-logo text-3xl">
-                        DocClinicx
-                        </span>
+					<a class="flex items-center gap-4" href="{{ url('/') }}">
+						<img alt="" class="w-14" src="{{ asset('images/FILARCA.png') }}">
+						<span class="-ml-2 font-serif text-2xl mt-2">
+							Filarca-Rabena
+						</span>
 					</a>
 				</div>
-
 			</div>
 
 			<!-- Settings Dropdown -->
@@ -21,8 +20,17 @@
 					<x-slot name="trigger">
 						<button
 							class="inline-flex gap-2 items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-							<div class="flex flex-col items-end gap-1">
-								{{ auth()->user()->full_name }}
+							<div class="flex items-center gap-4">
+								@if (Auth::user()->profile)
+									<img alt="Rounded avatar" class="w-10 h-10 rounded-full" src="{{ asset('storage/' . Auth::user()->profile) }}">
+								@else
+									<div
+										class="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600">
+										<span class="font-semibold text-gray-600 dark:text-gray-300">{{ Auth::user()->initial }}</span>
+									</div>
+								@endif
+
+								<span class="hidden md:block">{{ auth()->user()->full_name }}</span>
 							</div>
 
 							<div class="ms-1">
@@ -36,28 +44,36 @@
 					</x-slot>
 
 					<x-slot name="content">
-						@if (auth()->user()->userType == 'SuperAdmin')
+						@if (auth()->user()->userType == 'superadmin')
 							<x-dropdown-link :href="route('superadmin.profile.edit')">
 								{{ __('Profile') }}
 							</x-dropdown-link>
-                            <x-dropdown-link :href="route('superadmin.patients.index')">
+							<x-dropdown-link :href="route('superadmin.appointments.view')">
+								{{ __('View Appointments') }}
+							</x-dropdown-link>
+							<x-dropdown-link :href="route('superadmin.patients.index')">
 								{{ __('View Patients') }}
 							</x-dropdown-link>
-                            <x-dropdown-link :href="route('superadmin.prescriptions.index')">
+							<x-dropdown-link :href="route('superadmin.prescriptions.index')">
 								{{ __('View Prescriptions') }}
 							</x-dropdown-link>
 						@else
 							<x-dropdown-link :href="route('profile.edit')">
 								{{ __('Profile') }}
 							</x-dropdown-link>
-						@endif
-
-						@if (auth()->user()->userType == 'user')
-							<x-dropdown-link :href="route('user.appointments', auth()->user()->id)">
+							<x-dropdown-link :href="route('user.reservation.list')">
+								{{ __('My Reservations') }}
+							</x-dropdown-link>
+							<x-dropdown-link :href="route('user.appointment.list')">
 								{{ __('My Appointments') }}
 							</x-dropdown-link>
 						@endif
 
+						{{-- @if (auth()->user()->userType == 'user')
+							<x-dropdown-link :href="route('user.appointments', auth()->user()->id)">
+								{{ __('My Appointments') }}
+							</x-dropdown-link>
+						@endif --}}
 
 						<!-- Authentication -->
 						<form action="{{ route('logout') }}" method="POST">
@@ -99,19 +115,25 @@
 			</div>
 
 			<div class="mt-3 px-4 space-y-1">
-				@if (auth()->user()->userType == 'SuperAdmin')
+				@if (auth()->user()->userType == 'superadmin')
 					<x-responsive-nav-link :href="route('superadmin.profile.edit')">
 						{{ __('Profile') }}
 					</x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('superadmin.patients.index')">
+					<x-responsive-nav-link :href="route('superadmin.appointments.view')">
+						{{ __('View Appointments') }}
+					</x-responsive-nav-link>
+					<x-responsive-nav-link :href="route('superadmin.patients.index')">
 						{{ __('View Patients') }}
 					</x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('superadmin.prescriptions.index')">
+					<x-responsive-nav-link :href="route('superadmin.prescriptions.index')">
 						{{ __('View Prescriptions') }}
 					</x-responsive-nav-link>
 				@else
 					<x-responsive-nav-link :href="route('profile.edit')">
 						{{ __('Profile') }}
+					</x-responsive-nav-link>
+					<x-responsive-nav-link :href="route('user.reservation.list')">
+						{{ __('My Appointments') }}
 					</x-responsive-nav-link>
 				@endif
 
@@ -121,7 +143,7 @@
 
 				@switch($user->userType)
 					@case('user')
-						<x-responsive-nav-link :href="route('user.appointments', $user->id)">
+						<x-responsive-nav-link :href="route('user.reservation.list', $user->id)">
 							{{ __('My Appointments') }}
 						</x-responsive-nav-link>
 					@break

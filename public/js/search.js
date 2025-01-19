@@ -1,28 +1,19 @@
-
-// search
-        $('#searchDentist').on('keyup', function() {
-
-		$searchValue = $(this).val();
-
-        if($searchValue !== ''){
-            $('#searchData').show();
-            $('#allData').hide();
-        }
-        else {
-            $('#searchData').hide();
-            $('#allData').show();
-        }
-
+$(document).ready(function () {
+    function fetchData(searchInput = '', url) {
         $.ajax({
-            type:'get',
-            url:"{{ 'admin/provider/search' }}",
-            data: {'search':$searchValue},
-
-            success:function(data) {
-                    $('#searchData').html(data);
-            },
-            error: function(xhr, status, error) {
-                console.error(error);
+            url: url,
+            method: 'GET',
+            data: { search: searchInput },
+            success: function(response) {
+                $('tbody').html(response.html);
             }
         });
-	});
+    }
+
+    // Bind the `keyup` event to filter the table based on user input
+    searchInput.keyup(function() {
+        var searchValue = $(this).val(); // Get the value of the input
+        fetchData(searchValue, url);
+    });
+
+});

@@ -21,7 +21,7 @@ class ServiceController extends Controller
     {
         $services = Service::where('availability', 1)->get();
         // dd($services);
-        return view('user/dashboard', ['services' => $services]);
+        return view('user/dashboard', ['services' => $services])->with('title', 'Available Services');
     }
     /**
      * Display a listing of the resource.
@@ -30,7 +30,7 @@ class ServiceController extends Controller
     {
         $services = Service::all();
         // dd($services);
-        return view('admin.services.index', ['services' => $services]);
+        return view('admin.services.index', compact('services'))->with('title', 'Services | View List');
     }
 
     /**
@@ -38,7 +38,7 @@ class ServiceController extends Controller
      */
     public function create()
     {
-        return view('admin.services.create');
+        return view('admin.services.create')->with('title', 'Services | Create');
     }
 
     /**
@@ -63,7 +63,7 @@ class ServiceController extends Controller
      */
     public function edit(Service $service)
     {
-        return view('admin.services.edit', ['service' => $service]);
+        return view('admin.services.edit', ['service' => $service])->with('title', 'Service | Update Details');
     }
 
     /**
@@ -87,45 +87,4 @@ class ServiceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-
-    public function search(Request $request)
-    {
-        $request->validate([
-            'search' => 'required|string'
-        ]);
-
-        $search = $request->search;
-
-        // Perform the search query
-        $services = Service::where('name', 'LIKE', '%' . $search . '%')
-            ->orWhere('description', 'LIKE', '%' . $search . '%')
-            ->orWhere('duration', 'LIKE', '%' . $search . '%')
-            ->orWhere('price', 'LIKE', '%' . $search . '%')
-            ->get();
-
-        $searchDisplay = '';
-
-        foreach ($services as $service) {
-            $searchDisplay .= '
-            <tr class="bg-white border-b hover:bg-gray-50">
-                <td class="px-6 py-4">' . htmlspecialchars($service->name) . '</td>
-                <td class="px-6 py-4">Php' . number_format($service->price, 0, ".", ",") . '</td>
-                <td class="px-6 py-4">' . htmlspecialchars($service->description) . '</td>
-                <td class="px-6 py-4 text-center ">
-                    ' . ($service->availability ? '<span class="text-green-500 text-sm">Available</span>' : '<span class="text-yellow-500 text-sm">Not Available</span>') . '
-                </td>
-                <td class="px-6 py-4 text-right space-x-2 flex items-center">
-                    <a class="font-medium text-white bg-blue-600 px-2 py-1 rounded hover:bg-blue-700 flex items-center justify-center gap-1 w-fit" href="' . route('services.edit', ['service' => $service->id]) . '"><svg fill="none" height="15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-												stroke="currentColor" viewBox="0 0 24 24" width="15" xmlns="http://www.w3.org/2000/svg">
-												<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-												<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-											</svg>
-											<span class="hidden md:block">Edit</span></a>
-
-                </td>
-            </tr>';
-        }
-
-        return response($searchDisplay);
-    }
 }

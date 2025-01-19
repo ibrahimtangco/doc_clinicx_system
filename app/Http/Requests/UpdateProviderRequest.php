@@ -26,10 +26,11 @@ class UpdateProviderRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'reg_number' => ['required', 'string', Rule::unique('providers')->ignore($this->provider->id)],
             'title' => ['string', 'max:255'],
-            'first_name' => ['string', 'required', 'max:255'],
-            'middle_name' => ['max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZÀ-ÖØ-öø-ÿ\s\'-]+$/'],
+            'middle_name' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-ZÀ-ÖØ-öø-ÿ\s\'-]+$/'],
+            'last_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-ZÀ-ÖØ-öø-ÿ\s\'-]+$/'],
             'province' => ['required', 'string', 'max:255'],
             'city' => ['required', 'string', 'max:255'],
             'barangay' => ['required', 'string', 'max:255'],
@@ -43,11 +44,23 @@ class UpdateProviderRequest extends FormRequest
                 'email' => [
                     'required',
                     'email',
-                    Rule::unique('users')->ignore($this->route('provider')->id, 'id') // Ignore the current provider's email
+                    Rule::unique('users')->ignore($this->provider->user_id)
                 ]
             ],
 
 
+        ];
+    }
+
+
+    public function messages()
+    {
+        return [
+            'reg_number.required' => 'The registration number field is required.',
+            'reg_number.unique' => 'The registration number has already been taken.',
+            'first_name.regex' => 'The first name can only contain letters, spaces, hyphens, and apostrophes.',
+            'last_name.regex' => 'The last name can only contain letters, spaces, hyphens, and apostrophes.',
+            'email.unique' => 'This email address is already registered.',
         ];
     }
 }

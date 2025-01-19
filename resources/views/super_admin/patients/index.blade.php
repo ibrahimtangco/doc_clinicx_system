@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout :title="$title">
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
 			{{ __('Patients') }}
@@ -6,111 +6,67 @@
 		</h2>
 	</x-slot>
 
-	{{-- main container --}}
-
 	<div class="py-6 px-4">
 		<div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-			<div class="flex items-center justify-between w-full py-2">
-				<div></div>
-				<x-search id="searchPatient" value="Patients" />
-			</div>
-
-			@if ($patients->count() > 0)
-				<div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-					<table class="p-2 w-full text-sm text-left rtl:text-right text-gray-500">
-						<div id="all">
-							<thead class="text-xs text-gray-700 uppercase bg-gray-50">
-								<tr>
-									<th class="px-6 py-3" scope="col">First Name</th>
-									<th class="px-6 py-3" scope="col">Middle Name</th>
-									<th class="px-6 py-3" scope="col">Last Name</th>
-									<th class="px-6 py-3" scope="col">Address</th>
-									<th class="px-6 py-3" scope="col">Email</th>
-									<th class="px-6 py-3" scope="col"><span class="sr-only">Action</span></th>
+			<div class="overflow-x-auto">
+				<table class="p-2 w-full text-sm text-left rtl:text-right text-gray-500" id="search-table">
+					<div id="all">
+						<thead class="text-xs text-gray-700 uppercase bg-gray-50">
+							<tr>
+								<th class="px-6 py-3" scope="col"><span class="flex items-center">
+										Name
+										<svg aria-hidden="true" class="w-4 h-4 ms-1" fill="none" height="24" viewBox="0 0 24 24" width="24"
+											xmlns="http://www.w3.org/2000/svg">
+											<path d="m8 15 4 4 4-4m0-6-4-4-4 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+												stroke="currentColor" />
+										</svg>
+									</span></th>
+								<th class="px-6 py-3" scope="col"><span class="flex items-center">
+										Address
+										<svg aria-hidden="true" class="w-4 h-4 ms-1" fill="none" height="24" viewBox="0 0 24 24" width="24"
+											xmlns="http://www.w3.org/2000/svg">
+											<path d="m8 15 4 4 4-4m0-6-4-4-4 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+												stroke="currentColor" />
+										</svg>
+									</span></th>
+								<th class="px-6 py-3" scope="col"><span class="flex items-center">
+										Email
+										<svg aria-hidden="true" class="w-4 h-4 ms-1" fill="none" height="24" viewBox="0 0 24 24" width="24"
+											xmlns="http://www.w3.org/2000/svg">
+											<path d="m8 15 4 4 4-4m0-6-4-4-4 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+												stroke="currentColor" />
+										</svg>
+									</span></th>
+								<th class="px-6 py-3" scope="col"><span class="sr-only">Action</span></th>
+							</tr>
+						</thead>
+						<tbody id="allData">
+							@foreach ($patients as $patient)
+								<tr class="bg-white border-b hover:bg-gray-50">
+									<td class="px-6 py-4">{{ $patient->user->full_name }}</td>
+									<td class="px-6 py-4">{{ $patient->user->address }}</td>
+									<td class="px-6 py-4">{{ $patient->user->email }}</td>
+									<td class="px-6 py-4 text-right space-x-2 flex items-center">
+										<a
+											class="font-medium text-white bg-blue-600 px-2 py-1 rounded hover:bg-blue-700 flex items-center justify-center gap-1 w-fit"
+											href="{{ route('superadmin.show.patient.record', ['patient' => $patient->id]) }}">
+											<i class="fa-solid fa-eye"></i>
+											<span class="hidden md:block">View</span>
+										</a>
+									</td>
 								</tr>
-							</thead>
-							<tbody id="allData">
-								@foreach ($patients as $patient)
-									<tr class="bg-white border-b hover:bg-gray-50">
-										<td class="px-6 py-4">{{ $patient->user->first_name }}</td>
-										<td class="px-6 py-4">{{ $patient->user->middle_name }}</td>
-										<td class="px-6 py-4">{{ $patient->user->last_name }}</td>
-										<td class="px-6 py-4">{{ $patient->user->address }}</td>
-										<td class="px-6 py-4">{{ $patient->user->email }}</td>
-										<td class="px-6 py-4 text-right space-x-2 flex items-center">
-											<a
-												class="font-medium text-white bg-blue-600 px-2 py-1 rounded hover:bg-blue-700 flex items-center justify-center gap-1 w-fit"
-												href="{{ route('superadmin.show.patient.record', ['patient' => $patient->id]) }}">
-												<svg fill="none" height="15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-													stroke="currentColor" viewBox="0 0 24 24" width="15" xmlns="http://www.w3.org/2000/svg">
-													<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-													<path d="M12 9a3 3 0 1 0 0 6 3 3 0 1 0 0-6z"></path>
-												</svg>
-												<span>View</span>
-											</a>
-											<a
-												class="font-medium text-white bg-orange-600 px-2 py-1 rounded hover:bg-orange-700 flex items-center justify-center gap-1 w-fit"
-												href="{{ route('superadmin.patients.edit', ['patient' => $patient->id]) }}">
-												<svg fill="none" height="15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-													stroke="currentColor" viewBox="0 0 24 24" width="15" xmlns="http://www.w3.org/2000/svg">
-													<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-													<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-												</svg>
-												<span>Edit</span>
-											</a>
-
-										</td>
-									</tr>
-								@endforeach
-							</tbody>
-
-							<tbody id="searchData">
-
-							</tbody>
-
-					</table>
-
-				</div>
-				<div class="mt-4">
-					{{ $patients->links('pagination::tailwind') }}
-				</div>
-			@else
-				<div class="text-center text-xl text-text-desc">No patients Found</div>
-			@endif
-
+							@endforeach
+						</tbody>
+				</table>
+			</div>
 		</div>
 	</div>
-
 	<script>
-		// search
-		$('#searchPatient').on('keyup', function() {
-
-			$searchValue = $(this).val();
-
-			if ($searchValue !== '') {
-				$('#searchData').show();
-				$('#allData').hide();
-			} else {
-				$('#searchData').hide();
-				$('#allData').show();
-			}
-
-			$.ajax({
-				type: 'get',
-				url: '{{ route('superadmin.search.patient') }}',
-				data: {
-					'search': $searchValue
-				},
-
-				success: function(data) {
-					$('#searchData').html(data);
-                    console.log($data);
-				},
-				error: function(xhr, status, error) {
-					console.error(error);
-				}
+		if (document.getElementById("search-table") && typeof simpleDatatables.DataTable !== 'undefined') {
+			const dataTable = new simpleDatatables.DataTable("#search-table", {
+				searchable: true,
+				sortable: true
 			});
-		});
+		}
 	</script>
-
 </x-app-layout>

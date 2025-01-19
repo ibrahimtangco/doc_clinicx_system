@@ -1,5 +1,5 @@
 <div
-	class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full bg-black/50 backdrop-blur-sm"
+	class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-full max-h-full bg-black/50 backdrop-blur-sm"
 	id="add-contact">
 	<div class="relative p-4 w-full max-w-2xl max-h-full">
 		<!-- Modal content -->
@@ -31,16 +31,13 @@
 					</div>
 					<div class="w-full">
 						<x-input-label :value="__('Email Address')" for="email" />
-						<x-text-input :value="old('email')" autofocus class="mt-1 w-full" id="email" name="email"
-							type="text" />
+						<x-text-input :value="old('email')" autofocus class="mt-1 w-full" id="email" name="email" type="text" />
 						<x-input-error :messages="$errors->get('email')" class="mt-2" />
 					</div>
-					<div class="flex items-center pb-2">
-						<x-primary-button class=" px-6">
-							{{ __('Add') }}
-						</x-primary-button>
+					<x-primary-button class=" px-6">
+						{{ __('Add') }}
+					</x-primary-button>
 
-					</div>
 				</form>
 			</div>
 

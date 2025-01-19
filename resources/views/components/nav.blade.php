@@ -5,9 +5,11 @@
 			<div class="flex">
 				<!-- Logo -->
 				<div class="shrink-0 flex items-center">
-					<a class="flex items-center" href="{{ url('/') }}">
-						<img alt="" class="w-16 -ml-3" src="{{ asset('images/LOGO_ICON.png') }}">
-						<span class="-ml-1 font-logo text-3xl">DocClinix</span>
+					<a class="flex items-center gap-4" href="{{ url('/') }}">
+						<img alt="" class="w-14" src="{{ asset('images/FILARCA.png') }}">
+						<span class="-ml-2 font-serif text-2xl mt-2">
+							Filarca-Rabena
+						</span>
 					</a>
 				</div>
 			</div>
@@ -25,8 +27,13 @@
 						<a
 							class="px-4 py-2 bg-primary border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-background-hover focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
 							href="{{ route('admin.dashboard') }}">Dashboard</a>
-					@elseif (auth()->user()->userType == 'SuperAdmin')
-						<a class="px-4 py-2 bg-primary border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-background-hover focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
+					@elseif (auth()->user()->userType == 'staff')
+						<a
+							class="px-4 py-2 bg-primary border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-background-hover focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
+							href="{{ route('admin.dashboard') }}">Dashboard</a>
+					@elseif (auth()->user()->userType == 'superadmin')
+						<a
+							class="px-4 py-2 bg-primary border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-background-hover focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
 							href="{{ route('superadmin.appointments.view') }}">View Appointments</a>
 					@else
 						<a
@@ -94,8 +101,13 @@
 				</x-responsive-nav-link>
 
 				<a class="block py-2 px-3 text-white bg-primary rounded" href="{{ route('user.dashboard') }}">
+
 					@auth
-						{{ __('Book') }}
+						@if (Auth::user()->userType === 'user')
+                            {{ __('Book') }}
+                        @else
+                            {{ __('Dashboard') }}
+                        @endif
 					@else
 						{{ __('Login') }}
 					@endauth
