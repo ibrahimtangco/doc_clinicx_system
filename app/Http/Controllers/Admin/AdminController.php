@@ -106,6 +106,9 @@ class AdminController extends Controller
 
         $totalPrescriptions = Prescription::whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->count();
 
+        $currentMonth = Carbon::now()->month;
+        $currentYear = Carbon::now()->year;
+
         $productSalesData = DB::table('transaction_details')
             ->join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
             ->join('products', 'transaction_details.product_id', '=', 'products.id')
@@ -114,6 +117,8 @@ class AdminController extends Controller
                 DB::raw('SUM(transaction_details.total_amount) as total_sales'),
                 DB::raw('SUM(transaction_details.quantity) as total_quantity')
             )
+            ->whereMonth('transactions.created_at', $currentMonth)
+            ->whereYear('transactions.created_at', $currentYear)
             ->groupBy('products.name')
             ->get();
 

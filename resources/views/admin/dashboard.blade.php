@@ -102,7 +102,7 @@
             <!-- Product Sales Chart -->
             <div class="bg-white p-6 shadow-sm rounded-lg overflow-x-auto">
                 <div class="flex items-center justify-between mb-4 md:mb-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Product Sales</h3>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Monthly Product Sales</h3>
                     {{-- <div class="flex gap-2 items-center">
                         <label class="block text-gray-700 font-medium text-sm" for="trend-selector">View Sales:</label>
                         <select class="block w-full border-gray-300 rounded-md text-text-desc" id="trend-selector"
@@ -145,7 +145,7 @@
                                     <td class="px-6 py-4 text-sm text-gray-500">
                                         {{ Carbon\Carbon::parse($appointment->reservation->date)->format('F j, Y') }}
                                     </td>
-                                    <td class="px-6 py-4 text-sm text-green-600">{{ $appointment->status }}</td>
+                                    <td class="px-6 py-4 text-sm text-green-600 capitalize">{{ $appointment->status }}</td>
                                 </tr>
                             @endforeach
                         @else
