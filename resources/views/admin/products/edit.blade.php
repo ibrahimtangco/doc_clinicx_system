@@ -1,7 +1,7 @@
 <x-admin-layout :title="$title">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            <a href="{{ route('products.index') }}">{{ __('Products') }}</a>
+            <a href="{{ route('products.index') }}">{{ __('Product Inventory') }}</a>
         </h2>
     </x-slot>
 
@@ -82,6 +82,15 @@
                                     id="quantity" name="quantity" type="number" />
                                 <x-input-error :messages="$errors->get('quantity')" class="mt-2" />
                             </div>
+
+                            <div class="mt-4">
+                                <x-input-label :value="__('Minimum Stock Treshhold')" for="minimum_stock" />
+                                <x-text-input :value="old('minimum_stock', $product->minimum_stock)" autocomplete="minimum_stock" autofocus
+                                    class="block mt-1 w-full {{ $errors->has('minimum_stock') ? 'is-invalid' : '' }}"
+                                    id="minimum_stock" name="minimum_stock" type="number" />
+                                <x-input-error :messages="$errors->get('minimum_stock')" class="mt-2" />
+                            </div>
+
 
                             <div class="mt-4">
                                 <x-input-label :value="__('Buying Price in Peso')" for="buying-price" />

@@ -1,7 +1,7 @@
 <x-admin-layout :title="$title">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Transactions') }}
+            {{ __('Sales Transaction') }}
         </h2>
     </x-slot>
 
@@ -49,17 +49,54 @@
                 <table id="search-table" class="p-2 w-full text-sm text-left rtl:text-right text-gray-500">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                         <tr>
-                            <th scope="col" class="px-6 py-3">Transaction Code</th>
-                            <th scope="col" class="px-6 py-3">Date</th>
-                            <th scope="col" class="px-6 py-3">Total Quantity</th>
-                            <th scope="col" class="px-6 py-3">Total Amount</th>
+                            <th class="px-6 py-3" scope="col"><span class="flex items-center">
+                                Id
+                                <svg aria-hidden="true" class="w-4 h-4 ms-1" fill="none" height="24" viewBox="0 0 24 24" width="24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="m8 15 4 4 4-4m0-6-4-4-4 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        stroke="currentColor" />
+                                </svg>
+                            </span></th>
+                            <th class="px-6 py-3" scope="col"><span class="flex items-center">
+                                Tranaction Code
+                                <svg aria-hidden="true" class="w-4 h-4 ms-1" fill="none" height="24" viewBox="0 0 24 24" width="24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="m8 15 4 4 4-4m0-6-4-4-4 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        stroke="currentColor" />
+                                </svg>
+                            </span></th>
+                            <th class="px-6 py-3" scope="col"><span class="flex items-center">
+                                Date
+                                <svg aria-hidden="true" class="w-4 h-4 ms-1" fill="none" height="24" viewBox="0 0 24 24" width="24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="m8 15 4 4 4-4m0-6-4-4-4 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        stroke="currentColor" />
+                                </svg>
+                            </span></th>
+                            <th class="px-6 py-3" scope="col"><span class="flex items-center">
+                                Total Quantity
+                                <svg aria-hidden="true" class="w-4 h-4 ms-1" fill="none" height="24" viewBox="0 0 24 24" width="24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="m8 15 4 4 4-4m0-6-4-4-4 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        stroke="currentColor" />
+                                </svg>
+                            </span></th>
+                            <th class="px-6 py-3" scope="col"><span class="flex items-center">
+                                Total Amount
+                                <svg aria-hidden="true" class="w-4 h-4 ms-1" fill="none" height="24" viewBox="0 0 24 24" width="24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="m8 15 4 4 4-4m0-6-4-4-4 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        stroke="currentColor" />
+                                </svg>
+                            </span></th>
                             <th scope="col" class="px-6 py-3">Action</th>
                         </tr>
                     </thead>
                     <tbody id="allData">
                         @foreach ($transactions as $transaction)
                             <tr class="bg-white border-b hover:bg-gray-50">
-                                <td class="px-6 py-4 font-bold text-primary">{{ $transaction->transaction_code }}</td>
+                                <td class="px-6 py-4">{{ $transaction->id }}</td>
+                                <td class="px-6 py-4">{{ $transaction->transaction_code }}</td>
                                 <td class="px-6 py-4">{{ $transaction->created_at->format('F j, Y, g:i a') }}</td>
                                 <td class="px-6 py-4">{{ $transaction->total_quantity }}</td>
                                 <td class="px-6 py-4">Php {{ $transaction->total_amount }}</td>

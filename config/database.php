@@ -61,6 +61,9 @@ return [
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
+            'dump' => [
+                'dump_binary_path' => env('DB_DUMP_PATH', ''), // Use the path from the .env file
+            ],
         ],
 
         'pgsql' => [
@@ -147,5 +150,44 @@ return [
         ],
 
     ],
+
+        /*
+    |--------------------------------------------------------------------------
+    | Schema Settings
+    |--------------------------------------------------------------------------
+    |
+    | This block will contain the names of the tables for which it is
+    | necessary to export data along with the table schema.
+    |
+    */
+
+    'schema' => [
+        'tables' => [
+            'activity_log',
+            'appointments',
+            'categories',
+            'contacts',
+            'daily_patient_capacity',
+            'failed_jobs',
+            'footers',
+            'jobs',
+            'medical_history',
+            'migrations',
+            'password_reset_tokens',
+            'patients',
+            'personal_access_tokens',
+            'prescriptions',
+            'products',
+            'providers',
+            'reservations',
+            'services',
+            'social_media',
+            'transactions',
+            'transaction_details',
+            'unit_types',
+            'users'
+        ],
+    ],
+
 
 ];

@@ -18,41 +18,53 @@ class AppointmentController extends Controller
     public function index()
     {
         $appointments = Appointment::with(['reservation.user', 'reservation.patient', 'reservation.service'])
-                        ->orderByRaw("CASE 
-                            WHEN status = 'scheduled' THEN 1 
-                            ELSE 2 
+            ->orderByRaw("CASE
+                            WHEN status = 'scheduled' THEN 1
+                            ELSE 2
                         END")
-                        ->get();
+            ->get();
 
 
         return view('super_admin.appointments.view', compact('appointments'))->with('title', 'Appointments | View List');
     }
 
+    public function myServiceHistories()
+    {
+        $user = auth()->user();
+
+        $myServiceHistories = Appointment::join('reservations', 'appointments.reservation_id', '=', 'reservations.id')
+            ->where('reservations.patient_id', $user->patient->id)
+            ->where('appointments.status', 'completed')
+            ->select('appointments.*') // Select appointment columns
+            ->get();
+
+        return view('user.user-service-histories', compact('myServiceHistories'))->with('title', 'Service Histories | View List');
+    }
     public function userAppointmentList()
     {
         $user = auth()->user(); // Get the authenticated user
-        // $appointments = Appointment::with(['reservation.service', 'reservation.patient'])
-        //     ->whereHas('reservation.patient', function ($query) use ($user) {
-        //         $query->where('user_id', $user->id); // Filter patients by the authenticated user's ID
-        //     })
-        //     ->get();
 
         $appointments = Appointment::with(['reservation.service', 'reservation.patient'])
-        ->whereHas('reservation.patient', function (Builder $query) use ($user) {
-            $query->where('user_id', $user->id);
-        })
-        ->join('reservations', 'appointments.reservation_id', '=', 'reservations.id') // Join the reservations table
-        ->orderByRaw("CASE WHEN appointments.status = 'scheduled' THEN 0 ELSE 1 END")
-        ->orderBy('reservations.date', 'desc') // Use reservations.date for ordering
-        ->select('appointments.*') // Ensure only appointment columns are selected
-        ->get();
-    
+            ->whereHas('reservation.patient', function (Builder $query) use ($user) {
+                $query->where('user_id', $user->id);
+            })
+            ->join('reservations', 'appointments.reservation_id', '=', 'reservations.id') // Join the reservations table
+            ->orderByRaw("CASE WHEN appointments.status = 'scheduled' THEN 0 ELSE 1 END")
+            ->orderBy('reservations.date', 'desc') // Use reservations.date for ordering
+            ->select('appointments.*') // Ensure only appointment columns are selected
+            ->get();
+
 
         return view('user.user-appointments', compact('appointments'))->with('title', 'Appointments | View List');
     }
     public function indexAdmin()
     {
-        $appointments = Appointment::with(['reservation.user', 'reservation.patient', 'reservation.service'])->get();
+        $appointments = Appointment::with(['reservation.user', 'reservation.patient', 'reservation.service'])
+            ->orderByRaw("CASE
+                        WHEN status = 'scheduled' THEN 1
+                        ELSE 2
+                    END")
+            ->get();
 
         return view('admin.appointments.view-appointments', compact('appointments'))->with('title', 'Appointments | View List');
     }

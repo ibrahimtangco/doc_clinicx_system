@@ -75,7 +75,7 @@
         <select
             class="w-full mt-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm {{ $errors->has('province') ? 'is-invalid' : '' }}"
             id="province" name="province">
-            <option value="">--Select Province--</option>
+            <option value="">Select Province</option>
             @if (!empty($provinces))
                 @foreach ($provinces as $code => $name)
                     <option {{ old('province') == $code ? 'selected' : '' }} value="{{ $code }}">
@@ -130,7 +130,7 @@
             <select
                 class="w-full mt-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm {{ $errors->has('status') ? 'is-invalid' : '' }}"
                 id="status" name="status">
-                <option value="">-Select Status-</option>
+                <option value="">Select Status</option>
                 <option {{ old('status') == 'Single' ? 'selected' : '' }} value="Single">Single</option>
                 <option {{ old('status') == 'Married' ? 'selected' : '' }} value="Married">Married</option>
                 <option {{ old('status') == 'Annulled' ? 'selected' : '' }} value="Annulled">Annulled</option>
@@ -150,7 +150,7 @@
         <select
             class="w-full mt-1 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm {{ $errors->has('user-type') ? 'is-invalid' : '' }}"
             id="title" name="userType">
-            <option>--Select User Type--</option>
+            <option>Select User Type</option>
             <option value="admin">Admin</option>
             <option value="staff">Staff</option>
         </select>

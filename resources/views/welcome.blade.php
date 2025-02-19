@@ -4,14 +4,13 @@
 		<main class="max-w-7xl mx-auto space-y-10 -mt-12 md:-mt-0 px-6 grid-cols-2 pt-40 md:px-10 md:grid md:space-y-0"
 			id="hero">
 			<div class="space-y-4 col-span-1 md:w-10/12">
-				<h1 class="text-5xl  font-bold text-primary-hover md:text-6xl">We care about your smile</h1> {{route('user.appointment.list')}}
+				<h1 class="text-5xl  font-bold text-primary-hover md:text-6xl">We care about your smile</h1>
 				<p class="text-medium text-secondary-text">Welcome to DocClinicx, where your smile is our priority. Schedule an
 					appointment today for personalized dental care tailored to brighten your smile and enhance your oral health
 					journey.
 				</p>
 
 				@auth
-
 					@if (auth()->user()->userType == 'admin')
 						<a class="bg-primary block w-max text-white-text text-sm px-8 py-3 rounded font-semibold hover:bg-background-hover"
 							href="{{ route('admin.dashboard') }}">Go to Dashboard</a>
@@ -20,7 +19,7 @@
 							href="{{ route('admin.dashboard') }}">Go to Dashboard</a>
 					@elseif (auth()->user()->userType == 'superadmin')
 						<a class="bg-primary block w-max text-white-text text-sm px-8 py-3 rounded font-semibold hover:bg-background-hover"
-							href="{{ route('superadmin.appointments.view') }}">View appointments</a>
+							href="{{ route('superadmin.appointments.view') }}">View Reservations</a>
 					@else
 						<a class="bg-primary block w-max text-white-text text-sm px-8 py-3 rounded font-semibold hover:bg-background-hover"
 							href="{{ url('/dashboard') }}">Book appointment</a>
@@ -39,7 +38,7 @@
 		{{-- ABOUT --}}
 		<section class="my-20 px-6 bg-primary py-12 " id="about">
 			<div class="max-w-7xl mx-auto md:grid grid-cols-2 gap-4">
-				<div class="col-span-1 place-self-center md:pr-32 space-y-3 md:order-2 animate__animated animate__fadeInLeft">
+				<div class="col-span-1 place-self-center md:pr-32 space-y-3 md:order-2">
 					<h2 class="text-5xl font-semibold text-white mb-4">About Us</h2>
 					<p class="text-white-text ">Welcome to DocClinicx, your trusted destination for convenient and professional dental
 						care. At DocClinicx, we're

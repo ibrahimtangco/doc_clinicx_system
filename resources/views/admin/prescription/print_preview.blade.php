@@ -3,7 +3,7 @@
 		<div class="max-w-3xl mx-auto bg-white rounded-lg">
 			<header class="flex justify-between items-center mb-6">
 				<div class="flex-1 text-left">
-					<h1 class="text-2xl font-bold">Filarca-Rabena Dental Clinic</h1>
+					<h1 class="text-2xl font-bold">Filarca-Rabena-Corpuz Dental Clinic</h1>
 					<p class="text-sm">113 Salcedo St. Brgy 3, Vigan City, Ilocos Sur, Philippines 2700.</p>
 					<p class="text-sm">Clinic Hours: Monday - Saturday 8am - 6pm | Sunday: By Appointment</p>
 				</div>
@@ -55,7 +55,7 @@
 				<p class="text-sm">Take the medications as prescribed. Contact the clinic if you experience any side effects.</p>
 			</div>
 
-			<footer class="flex justify-between items-center mt-12">
+			{{-- <footer class="flex justify-between items-center mt-12">
 				<div>
 
 					<p class="text-sm">Doctor: Dr. {{ $prescription->provider->user->full_name }}</p>
@@ -63,9 +63,15 @@
 				</div>
 				<div>
 					<p class="text-sm">Signature:</p>
-					<p class="text-xs">____________________</p>
+					<div class="w-34 border_b border-.5 border-black"></div>
 				</div>
-			</footer>
+			</footer> --}}
+            <footer class="mt-12 flex justify-end">
+                <div class="flex flex-col items-center gap-1">
+                    <div class="border-b border-black w-48"></div>
+                    <p class="text-center">Dr. {{ $prescription->provider->user->full_name }}</p>
+                </div>
+            </footer>
 		</div>
 
 	</div>

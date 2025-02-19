@@ -86,18 +86,25 @@ class AdminController extends Controller
 
     public function index()
     {
-        $totalPatients = Patient::count();
-        $totalAppointments = Appointment::where('status', 'scheduled')->count();
-        $pendingReservations = Reservation::where('status', 'pending')->count();
-        $appointmentTrends = $this->showAppointmentTrends();
-        $upcomingAppointments = Appointment::where('status', 'scheduled')->get();
-        $totalTransactions = Transaction::count();
-        $totalPrescriptions = Prescription::count();
-        // dd($upcomingAppointments);
-        $dailyCapacities = DailyPatientCapacity::where('date', '>=', now()->startOfDay())
-            ->orderBy('date')
-            ->take(7) // For example, show the next 7 days
+        $totalPatients = Patient::whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->count();
+
+        $totalAppointments = Appointment::where('status', 'scheduled')
+            ->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
+            ->count();
+
+        $pendingReservations = Reservation::where('status', 'pending')
+            ->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
+            ->count();
+
+        $appointmentTrends = $this->showAppointmentTrends(); // Modify inside if needed
+
+        $upcomingAppointments = Appointment::where('status', 'scheduled')
+            ->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])
             ->get();
+
+        $totalTransactions = Transaction::whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->count();
+
+        $totalPrescriptions = Prescription::whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()])->count();
 
         $productSalesData = DB::table('transaction_details')
             ->join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
@@ -113,7 +120,7 @@ class AdminController extends Controller
         $productNames = $productSalesData->pluck('product_name')->toArray();
         $salesAmounts = $productSalesData->pluck('total_sales')->toArray();
         $quantities = $productSalesData->pluck('total_quantity')->toArray();
-        // $quantities = [10, 20, 15, 30, 25, 5];
+
         $salesAmounts = array_map('floatval', $salesAmounts);
 
         return view('admin.dashboard', [
@@ -125,7 +132,6 @@ class AdminController extends Controller
             'upcomingAppointments' => $upcomingAppointments,
             'totalTransactions' => $totalTransactions,
             'totalPrescriptions' => $totalPrescriptions,
-            'dailyCapacities' => $dailyCapacities,
             'productNames' => $productNames,
             'salesAmounts' => $salesAmounts,
             'quantities' => $quantities,

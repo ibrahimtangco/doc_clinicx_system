@@ -49,11 +49,11 @@
 				</a>
 
 				<!-- Dropdown Start -->
-				<div class="absolute right-0 mt-4 flex w-60 flex-col rounded-sm bg-white shadow-default shadow border-t"
+				<div class="absolute right-0 mt-4 flex w-screen sm:w-60 flex-col rounded-sm bg-white shadow-default shadow border-t"
 					x-show="dropdownOpen">
 					<ul class="flex flex-col gap-5 border-b border-stroke p-6 text-secondary-text">
 						<li>
-							<a class="flex items-center gap-3.5 text-sm font-medium duration-300 ease-in-out hover:text-link lg:text-base"
+							<a class="flex items-center gap-3.5 text-sm font-medium duration-300 text-text-desc ease-in-out hover:text-link lg:text-base"
 								href="{{ route('admin.profile.edit') }}">
 								<i class="fa-solid fa-user"></i>
 								My Profile
@@ -63,7 +63,7 @@
 						<form action="{{ route('logout') }}" method="POST">
 							@csrf
 							<a
-								class="flex items-center gap-3.5 pt-4 text-sm font-medium duration-300 ease-in-out hover:text-link lg:text-base"
+								class="flex items-center gap-3.5 pt-4 text-sm font-medium duration-300 text-text-desc ease-in-out hover:text-link lg:text-base"
 								href="route('logout')"
 								onclick="event.preventDefault();
                                         this.closest('form').submit();">

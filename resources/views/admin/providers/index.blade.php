@@ -24,6 +24,14 @@
 					<thead class="text-xs text-gray-700 uppercase bg-gray-50">
 						<tr>
 							<th class="px-6 py-3" scope="col"><span class="flex items-center">
+									Id
+									<svg aria-hidden="true" class="w-4 h-4 ms-1" fill="none" height="24" viewBox="0 0 24 24" width="24"
+										xmlns="http://www.w3.org/2000/svg">
+										<path d="m8 15 4 4 4-4m0-6-4-4-4 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+											stroke="currentColor" />
+									</svg>
+								</span></th>
+                                <th class="px-6 py-3" scope="col"><span class="flex items-center">
 									Reg. No
 									<svg aria-hidden="true" class="w-4 h-4 ms-1" fill="none" height="24" viewBox="0 0 24 24" width="24"
 										xmlns="http://www.w3.org/2000/svg">
@@ -64,6 +72,9 @@
 						@foreach ($providers as $provider)
 							<tr class="bg-white border-b hover:bg-gray-50">
 								<td class="px-6 py-4 font-bold text-gray-900 whitespace-nowrap" scope="row">
+									{{ $provider->id }}
+								</td>
+                                <td class="px-6 py-4 font-bold text-gray-900 whitespace-nowrap" scope="row">
 									{{ $provider->reg_number }}
 								</td>
 								<td class="px-6 py-4 " scope="row">

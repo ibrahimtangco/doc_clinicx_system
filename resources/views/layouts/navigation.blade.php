@@ -7,8 +7,8 @@
 				<div class="shrink-0 flex items-center">
 					<a class="flex items-center gap-4" href="{{ url('/') }}">
 						<img alt="" class="w-14" src="{{ asset('images/FILARCA.png') }}">
-						<span class="-ml-2 font-serif text-2xl mt-2">
-							Filarca-Rabena
+						<span class="hidden -ml-2 font-serif text-xl mt-2 sm:block md:text-2xl">
+							Filarca-Rabena-Corpuz
 						</span>
 					</a>
 				</div>
@@ -67,13 +67,10 @@
 							<x-dropdown-link :href="route('user.appointment.list')">
 								{{ __('My Appointments') }}
 							</x-dropdown-link>
-						@endif
-
-						{{-- @if (auth()->user()->userType == 'user')
-							<x-dropdown-link :href="route('user.appointments', auth()->user()->id)">
-								{{ __('My Appointments') }}
+                            <x-dropdown-link :href="route('user.service-histories.list')">
+								{{ __('My Service Histories') }}
 							</x-dropdown-link>
-						@endif --}}
+						@endif
 
 						<!-- Authentication -->
 						<form action="{{ route('logout') }}" method="POST">
@@ -133,10 +130,16 @@
 						{{ __('Profile') }}
 					</x-responsive-nav-link>
 					<x-responsive-nav-link :href="route('user.reservation.list')">
-						{{ __('My Appointments') }}
+						{{ __('My Reservations') }}
 					</x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('user.appointment.list', Auth::user()->id)">
+                        {{ __('My Appointments') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('user.service-histories.list', Auth::user()->id)">
+                        {{ __('My Service Histories') }}
+                    </x-responsive-nav-link>
 				@endif
-
+{{--
 				@php
 					$user = auth()->user();
 				@endphp
@@ -147,7 +150,7 @@
 							{{ __('My Appointments') }}
 						</x-responsive-nav-link>
 					@break
-				@endswitch
+				@endswitch --}}
 
 				<!-- Authentication -->
 				<form action="{{ route('logout') }}" method="POST">

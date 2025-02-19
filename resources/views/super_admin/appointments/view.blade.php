@@ -139,7 +139,7 @@
 													</g>
 												</g>
 											</svg>
-											<span>Edit</span>
+											<span class="hidden md:inline">Edit</span>
 										</button>
 									@else
 										<button
@@ -165,7 +165,7 @@
 													</g>
 												</g>
 											</svg>
-											<span>Edit</span>
+											<span class="hidden md:inline">Edit</span>
 										</button>
 									@endif
 								</td>

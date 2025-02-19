@@ -35,6 +35,7 @@
 
 	<!-- Simple Datatables -->
 	<script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3"></script>
+
 </head>
 
 <body class="font-sans antialiased text-dark" x-data="{ isAsideOpen: false }">

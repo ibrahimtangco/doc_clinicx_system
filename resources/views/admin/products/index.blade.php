@@ -1,7 +1,7 @@
 <x-admin-layout :title="$title">
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-			{{ __('Products') }}
+			{{ __('Product Inventory') }}
 
 		</h2>
 	</x-slot>
@@ -9,22 +9,57 @@
 	{{-- main container --}}
 	<div class="py-6 px-4">
 		<div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-			<div class="flex flex-col items-center justify-end mb-4 gap-4 md:flex-row">
-				<a class="w-full bg-primary text-white-text py-1 px-2 rounded-md flex items-center justify-center gap-1 md:w-auto"
-					href="{{ route('products.create') }}">
-					<i class="fa-solid fa-plus"></i> {{ __('Add') }}
-				</a>
-				<a
-					class=" w-full bg-green-600 text-white-text py-1 px-2 rounded-md flex items-center justify-center gap-1 md:w-auto hover:bg-green-700"
-					href="{{ route('download.product.list') }}">
-					<i class="fa-regular fa-file-pdf"></i> {{ __('Export') }}
-				</a>
-			</div>
 
+            {{--  --}}
+            <div class="md:flex gap-2 items-center justify-between mb-4 flex-wrap space-y-3 md:space-y-0">
+                <a class="bg-primary text-white-text py-1.5 px-4 rounded-md flex items-center justify-center text-center w-full md:w-auto"
+                    href="{{ route('products.create') }}">
+                    <i class="fa-solid fa-plus"></i> {{ __('Add') }}
+                </a>
+                {{-- download --}}
+                <form action="{{ route('download.product.list') }}" method="POST"
+                    class="w-full md:w-auto md:flex items-center gap-4 space-y-3 md:space-y-0">
+                    @csrf
+                    <div class="flex items-center flex-wrap gap-2 w-full md:flex-nowrap" date-rangepicker id="date-range-picker">
+                        <div class="relative flex-1">
+                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                <i class="fa-solid fa-calendar-days text-text-desc"></i>
+                            </div>
+                            <input type="text" id="datepicker-range-start" name="start" placeholder="Select date start"
+                                autocomplete="off"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2">
+                            <x-input-error :messages="$errors->get('start')" class="mt-2" />
+                        </div>
+                        <span class="mx-4 text-gray-500">to</span>
+                        <div class="relative flex-1">
+                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                <i class="fa-solid fa-calendar-days text-text-desc"></i>
+                            </div>
+                            <input type="text" id="datepicker-range-end" name="end" placeholder="Select date end"
+                                autocomplete="off"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2">
+                            <x-input-error :messages="$errors->get('end')" class="mt-2" />
+                        </div>
+                    </div>
+                    <button type="submit"
+                        class="w-full md:w-fit bg-green-600 text-white-text py-1.5 px-4 rounded-md hover:bg-green-700 flex items-center justify-center">
+                        <i class="fa-regular fa-file-pdf"></i> {{ __('Export') }}
+                    </button>
+                </form>
+            </div>
+            {{--  --}}
 			<div class="overflow-x-auto">
 				<table class="p-2 w-full text-sm text-left rtl:text-right text-gray-500" id="search-table">
 					<thead class="text-xs text-gray-700 uppercase bg-gray-50">
 						<tr>
+                            <th class="px-6 py-3" scope="col"><span class="flex items-center">
+                                Id
+                                <svg aria-hidden="true" class="w-4 h-4 ms-1" fill="none" height="24" viewBox="0 0 24 24" width="24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="m8 15 4 4 4-4m0-6-4-4-4 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        stroke="currentColor" />
+                                </svg>
+                            </span></th>
 							<th class="px-6 py-3" scope="col"><span class="flex items-center">
 									Name
 									<svg aria-hidden="true" class="w-4 h-4 ms-1" fill="none" height="24" viewBox="0 0 24 24" width="24"
@@ -57,7 +92,7 @@
 											stroke="currentColor" />
 									</svg>
 								</span></th>
-							<th class="px-6 py-3" scope="col"><span class="flex items-center">
+							<th class="px-6 py-3 text-right" scope="col"><span class="flex items-center">
 									Buying Price
 									<svg aria-hidden="true" class="w-4 h-4 ms-1" fill="none" height="24" viewBox="0 0 24 24" width="24"
 										xmlns="http://www.w3.org/2000/svg">
@@ -65,7 +100,7 @@
 											stroke="currentColor" />
 									</svg>
 								</span></th>
-							<th class="px-6 py-3" scope="col"><span class="flex items-center">
+							<th class="px-6 py-3 text-right" scope="col"><span class="flex items-center">
 									Selling Price
 									<svg aria-hidden="true" class="w-4 h-4 ms-1" fill="none" height="24" viewBox="0 0 24 24"
 										width="24" xmlns="http://www.w3.org/2000/svg">
@@ -87,23 +122,20 @@
 					<tbody>
 						@foreach ($products as $product)
 							<tr class="bg-white border-b hover:bg-gray-50">
+								<td class="px-6 py-4">{{ $product->id }}</td>
 								<td class="px-6 py-4">{{ $product->name }}</td>
 								<td class="px-6 py-4">{{ $product->category->name }}</td>
 								<td class="px-6 py-4 whitespace-nowrap">{{ $product->unit_type->name }}
 									{{ $product->unit_type->abbreviation }}
 								</td>
-								@php
-									$quantityClass = $product->quantity <= 50 ? 'bg-red-500' : ($product->quantity <= 100 ? 'bg-yellow-500' : '');
-									$quantityLabel = $product->quantity <= 100 ? 'Low' : '';
-								@endphp
-
 								<td class="px-6 py-4 text-nowrap">
-									{{ $product->quantity }} <span
-										class="{{ $quantityClass }} px-1 rounded text-white">{{ $quantityLabel }}</span>
-								</td>
-
-								<td class="px-6 py-4 text-nowrap">Php {{ $product->buying_price }}</td>
-								<td class="px-6 py-4 text-nowrap">Php {{ $product->selling_price }}</td>
+                                    {{ $product->quantity }}
+                                    @if ($product->quantity <= $product->minimum_stock)
+                                    <span class="bg-red-500 px-1 py-.5 rounded text-white">Low</span>
+                                 @endif
+                                </td>
+								<td class="px-6 py-4 text-nowrap text-right">Php {{ $product->buying_price }}</td>
+								<td class="px-6 py-4 text-nowrap text-right">Php {{ $product->selling_price }}</td>
 								<td class="px-6 py-4">
 									<span class="{{ $product->status ? 'text-green-500' : 'text-red-500' }}">
 										{{ $product->status ? 'Available' : 'Not Available' }}

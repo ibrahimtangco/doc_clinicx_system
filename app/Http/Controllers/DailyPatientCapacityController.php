@@ -13,7 +13,7 @@ class DailyPatientCapacityController extends Controller
 {
     public function index()
     {
-        $dailyPatientCapacities = DailyPatientCapacity::orderBy('date')->get();
+        $dailyPatientCapacities = DailyPatientCapacity::orderBy('date', 'desc')->get();
 
         return view('admin.daily_patient_capacity.index', compact('dailyPatientCapacities'))->with('title', 'Daily Capacities | View List');
     }
@@ -26,7 +26,7 @@ class DailyPatientCapacityController extends Controller
 
 
     public function store(DailyPatientCapacityRequest $request)
-    { 
+    {
         try {
             $result = DailyPatientCapacity::create([
                 'date' => $request->date,
@@ -54,7 +54,8 @@ class DailyPatientCapacityController extends Controller
     public function edit(DailyPatientCapacity $dailyPatientCapacity)
     {
 
-        return view('admin.daily_patient_capacity.edit', compact('dailyPatientCapacity'))->with('title', 'Daily Capacities | Update Details');;
+        return view('admin.daily_patient_capacity.edit', compact('dailyPatientCapacity'))->with('title', 'Daily Capacities | Update Details');
+        ;
     }
 
     public function update(DailyPatientCapacityRequest $request, DailyPatientCapacity $dailyPatientCapacity)

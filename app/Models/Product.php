@@ -20,6 +20,7 @@ class Product extends Model
                 'unit_type_id',
                 'description',
                 'quantity',
+                'minimum_stock',
                 'buying_price',
                 'selling_price',
                 'status'
@@ -60,6 +61,7 @@ class Product extends Model
             "unit_type_id" => $validated['unit_type_id'],
             "description" => $validated['description'],
             "quantity" => $validated['quantity'],
+            "minimum_stock" => $validated['minimum_stock'],
             "buying_price" => $validated['buying_price'],
             "selling_price" => $validated['selling_price'],
             'status' => array_key_exists('status', $validated) ? ($validated['status'] == true ? 1 : 0) : 0
@@ -71,9 +73,9 @@ class Product extends Model
 
         return
             Product::where('products.name', 'LIKE', '%' . $search . '%')
-            ->orWhereHas('category', function ($query) use ($search) {
-                $query->where('name', 'LIKE', '%' . $search . '%');
-            })
-            ->get();
+                ->orWhereHas('category', function ($query) use ($search) {
+                    $query->where('name', 'LIKE', '%' . $search . '%');
+                })
+                ->get();
     }
 }

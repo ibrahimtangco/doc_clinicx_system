@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\UnitType;
+use Illuminate\Http\Request;
 use Spatie\Browsershot\Browsershot;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
@@ -60,9 +61,8 @@ class ProductController extends Controller
 
     public function update(UpdateProductRequest $request, Product $product)
     {
-        $validated = $request->validated();
-
-        $product = $this->productModel->updateProduct($validated, $product);
+        $request = $request->validated();
+        $product = $this->productModel->updateProduct($request, $product);
 
         if (!$product) {
             emotify('error', 'Failed to update product');
@@ -73,30 +73,71 @@ class ProductController extends Controller
         return redirect()->route('products.index');
     }
 
-    public function downloadProductList()
+    public function downloadProductList(Request $request)
     {
-        $products = Product::all();
 
-        if ($products->isEmpty()) {
-            emotify('error', 'No products found.'); // Short and user-friendly message
-            return redirect()->back(); // Preserves input data for better user experience
+        // Validate input
+        $validated = $request->validate([
+            'start' => 'nullable|date_format:m/d/Y',
+            'end' => 'nullable|date_format:m/d/Y',
+        ]);
+
+        $fromDate = $validated['start'] ?? null;
+        $toDate = $validated['end'] ?? null;
+
+        // Query transactions
+        $query = Product::query();
+
+        // Apply date filters
+        if ($validated['start']) {
+            $start = Carbon::createFromFormat('m/d/Y', $validated['start'])->startOfDay();
+            $query->where('created_at', '>=', $start);
         }
-        
-        $path = public_path('images/FILARCA.png');
-        $type = pathinfo($path, PATHINFO_EXTENSION);
-        $data = file_get_contents($path);
-        $src = 'data:image/' . $type . ';base64,' . base64_encode($data);
 
-        $html = view('reports_template.product_list', ['imageSrc' => $src, 'products' => $products])->render();
-        $currentDateTime = Carbon::now()->format('d-m-Y');
+        if ($validated['end']) {
+            $end = Carbon::createFromFormat('m/d/Y', $validated['end'])->endOfDay();
+            $query->where('created_at', '<=', $end);
+        }
 
-        $pdfPath = public_path('Filarca - Rabena_Products_List_' . $currentDateTime . '.pdf');
+        // Retrieve transactions
+        $products = $query->get();
 
-        Browsershot::html($html)
+        // Handle missing transactions gracefully
+        if ($products->isEmpty()) {
+
+            emotify('error', 'No products found for the specified data range.');
+            return redirect()->back();
+        }
+
+
+        try {
+            $path = public_path('images/FILARCA.png');
+            $type = pathinfo($path, PATHINFO_EXTENSION);
+            $data = file_get_contents($path);
+            $src = 'data:image/' . $type . ';base64,' . base64_encode($data);
+
+            $html = view(
+                'reports_template.product_list',
+                [
+                    'imageSrc' => $src,
+                    'products' => $products,
+                    'fromDate' => $fromDate,
+                    'toDate' => $toDate
+                ]
+            )->render();
+            $currentDateTime = Carbon::now()->format('d-m-Y');
+
+            $pdfPath = public_path('Filarca - Rabena_Products_List_' . $currentDateTime . '.pdf');
+
+            Browsershot::html($html)
                 ->margins(15.4, 15.4, 15.4, 15.4)
                 ->showBackground()
                 ->save($pdfPath);
-                
-        return response()->download($pdfPath)->deleteFileAfterSend(true);
+
+            return response()->download($pdfPath)->deleteFileAfterSend(true);
+        } catch (\Exception $e) {
+            emotify('error', 'An error occurred while generating the PDF: ' . $e->getMessage());
+            return redirect()->back();
+        }
     }
 }

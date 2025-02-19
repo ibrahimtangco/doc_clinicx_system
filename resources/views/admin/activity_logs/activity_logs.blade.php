@@ -14,6 +14,14 @@
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50">
                         <tr>
                             <th class="px-6 py-3" scope="col"><span class="flex items-center">
+                                Id
+                                <svg aria-hidden="true" class="w-4 h-4 ms-1" fill="none" height="24"
+                                    viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="m8 15 4 4 4-4m0-6-4-4-4 4" stroke-linecap="round"
+                                        stroke-linejoin="round" stroke-width="2" stroke="currentColor" />
+                                </svg>
+                            </span></th>
+                            <th class="px-6 py-3" scope="col"><span class="flex items-center">
                                     Log Name
                                     <svg aria-hidden="true" class="w-4 h-4 ms-1" fill="none" height="24"
                                         viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
@@ -75,14 +83,21 @@
                         @foreach ($activityLogs as $log)
                             <tr class="bg-white border-b hover:bg-gray-50">
                                 <td class="px-6 py-4">
+                                    <span class="font-medium">{{ $log->id }}</span>
+                                </td>
+                                <td class="px-6 py-4">
                                     <span class="font-medium">{{ $log->log_name }}</span>
                                 </td>
                                 <td class="px-6 py-4 capitalize">
                                     {{ $log->description }}
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span class="font-medium">{{ $log->subject_type_friendly }}</span>:
-                                    <span class="font-semibold">{{ $log->subject_id }}</span>
+                                    @if ($log->subject_name)
+                                        <span class="font-semibold">{{ $log->subject_name }}</span>
+                                    @else
+                                        <span class="font-medium">{{ $log->subject_type_friendly }}</span>:
+                                        <span class="font-semibold">{{ $log->subject_id }}</span>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4">
                                     <span class="font-medium">{{ $log->causer_name }}</span>

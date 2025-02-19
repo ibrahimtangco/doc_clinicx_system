@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\City;
 use App\Models\User;
 use App\Models\Patient;
@@ -138,30 +139,64 @@ class PatientController extends Controller
         return $street ? "{$street}, {$barangay}, {$city}, {$province}" : "{$barangay}, {$city}, {$province}";
     }
 
-    public function downloadPatientList()
+    public function downloadPatientList(Request $request)
     {
-        $patients = Patient::all();
+        // Validate input
+        $validated = $request->validate([
+            'start' => 'nullable|date_format:m/d/Y',
+            'end' => 'nullable|date_format:m/d/Y',
+        ]);
+
+        $fromDate = $validated['start'] ?? null;
+        $toDate = $validated['end'] ?? null;
+
+        // Query transactions
+        $query = Patient::query();
+
+        // Apply date filters
+        if ($validated['start']) {
+            $start = Carbon::createFromFormat('m/d/Y', $validated['start'])->startOfDay();
+            $query->where('created_at', '>=', $start);
+        }
+
+        if ($validated['end']) {
+            $end = Carbon::createFromFormat('m/d/Y', $validated['end'])->endOfDay();
+            $query->where('created_at', '<=', $end);
+        }
+
+        // Retrieve transactions
+        $patients = $query->get();
+
+        // Handle missing transactions gracefully
         if ($patients->isEmpty()) {
-            emotify('error', 'There are no registered patients.');
+
+            emotify('error', 'No patients found for the specified data range.');
             return redirect()->back();
         }
-        
-        $path = public_path('images/FILARCA.png');
-        $type = pathinfo($path, PATHINFO_EXTENSION);
-        $data = file_get_contents($path);
-        $src = 'data:image/' . $type . ';base64,' . base64_encode($data);
 
-        $html = view('reports_template.patient_list', [
-            'imageSrc' => $src,
-            'patients' => $patients,
-        ])->render();
-        $pdfPath = public_path('FR_patient_list.pdf');
+        try {
+            $path = public_path('images/FILARCA.png');
+            $type = pathinfo($path, PATHINFO_EXTENSION);
+            $data = file_get_contents($path);
+            $src = 'data:image/' . $type . ';base64,' . base64_encode($data);
 
-        Browsershot::html($html)
-        ->margins(15.4, 15.4, 15.4, 15.4)
-        ->showBackground()
-        ->save($pdfPath);
+            $html = view('reports_template.patient_list', [
+                'imageSrc' => $src,
+                'patients' => $patients,
+                'fromDate' => $fromDate,
+                'toDate' => $toDate
+            ])->render();
+            $pdfPath = public_path('FR_patient_list.pdf');
 
-        return response()->download($pdfPath)->deleteFileAfterSend(true);
+            Browsershot::html($html)
+                ->margins(15.4, 15.4, 15.4, 15.4)
+                ->showBackground()
+                ->save($pdfPath);
+
+            return response()->download($pdfPath)->deleteFileAfterSend(true);
+        } catch (\Error $e) {
+            emotify('error', 'An error occurred while generating the PDF: ' . $toDate->getMessage());
+            return redirect()->back();
+        }
     }
 }

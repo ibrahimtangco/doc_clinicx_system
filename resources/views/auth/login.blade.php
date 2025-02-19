@@ -6,7 +6,7 @@
 			<a class="flex items-center pb-2" href="/">
 				<img alt="Logo" class="w-24" src="{{ asset('images/FILARCA.png') }}">
 			</a>
-			<h1 class="text-3xl text-center font-serif text-title">Filarca-Rabena</h1>
+			<h1 class="text-3xl text-center font-serif text-title">Filarca-Rabena-Corpuz</h1>
 			<p class="text-center font-serif text-title">Dental Clinic and Dental Supply</p>
 		</div>
 		<x-auth-session-status :status="session('status')" class="mb-4" />

@@ -108,6 +108,7 @@ Route::middleware(['auth', 'verified', 'role:user'])->group(function () {
 
     Route::get('user-reservations/list', [ReservationController::class, 'userReservationList'])->name('user.reservation.list');
     Route::get('user-appointments/list', [AppointmentController::class, 'userAppointmentList'])->name('user.appointment.list');
+    Route::get('user-service-histories/list', [AppointmentController::class, 'myServiceHistories'])->name('user.service-histories.list');
 });
 
 
@@ -172,6 +173,7 @@ Route::middleware(['auth', 'role:admin|staff'])->group(function () {
     // Dashboard
     Route::get('admin', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::get('/get-appointment-trends', [AdminController::class, 'getTrends']);
+    Route::get('/get-sales-trends', [AdminController::class, 'getSalesTrends']);
 
     // Profile
     Route::get('admin/profile', [ProfileController::class, 'edit'])->name('admin.profile.edit');
@@ -192,14 +194,14 @@ Route::middleware(['auth', 'role:admin|staff'])->group(function () {
     // Patients Read-only
     Route::get('admin/patients', [PatientController::class, 'index'])->name('patients.index');
     Route::get('admin/patients/record/{patient}', [MedicalHistoryController::class, 'show'])->name('show.patient.record');
-    Route::get('admin/patients/download-patient-list', [PatientController::class, 'downloadPatientList'])->name('download.patient.list');
-    Route::get('admin/paients/download/patient-histories/{patient}/', [MedicalHistoryController::class, 'downloadServiceHistories'])->name('download.patient.service.histories');
+    Route::post('admin/patients/download-patient-list', [PatientController::class, 'downloadPatientList'])->name('download.patient.list');
+    Route::post('admin/paients/download/patient-histories/{patient}/', [MedicalHistoryController::class, 'downloadServiceHistories'])->name('download.patient.service.histories');
 
     // Accounts Read-only
     Route::get('admin/accounts', [UserController::class, 'index'])->name('accounts.index');
 
     // Products and Categories (Admin and Staff)
-    Route::get('admin/product/download-product-list', [ProductController::class, 'downloadProductList'])->name('download.product.list');
+    Route::post('admin/product/download-product-list', [ProductController::class, 'downloadProductList'])->name('download.product.list');
     Route::get('admin/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('admin/products/create', [ProductController::class, 'create'])->name('products.create');
     Route::post('admin/products', [ProductController::class, 'store'])->name('products.store');
@@ -285,8 +287,8 @@ Route::middleware(['auth', 'role:superadmin'])->group(function () {
 Route::get('/test-notif', function () {
     // Get reservations with an 'approved' status for tomorrow
     $approvedReservations = Reservation::whereDate('date', Carbon::tomorrow())
-                    ->where('status', 'approved')
-                    ->get();
+        ->where('status', 'approved')
+        ->get();
 
     // Ensure that you only notify unique users
     $notifiedUsers = [];
@@ -336,29 +338,33 @@ Route::get('/inventory', function () {
 
 // service histories
 Route::get('history', function () {
-    $patient = Patient::find(22);
+    $patient = Patient::find(5);
 
     $serviceHistories =
         Appointment::join('reservations', 'appointments.reservation_id', '=', 'reservations.id')
-        ->where('reservations.patient_id', $patient->id)
-        ->where('appointments.status', 'completed')
-        ->select('appointments.*') // Select appointment columns
-        ->get();
+            ->where('reservations.patient_id', $patient->id)
+            ->where('appointments.status', 'completed')
+            ->select('appointments.*') // Select appointment columns
+            ->get();
 
     $path = public_path('images/FILARCA.png');
     $type = pathinfo($path, PATHINFO_EXTENSION);
     $data = file_get_contents($path);
     $src = 'data:image/' . $type . ';base64,' . base64_encode($data);
 
-    $html = view('reports_template.patient_service_histories', ['imageSrc' => $src, 'serviceHistories' => $serviceHistories])->render();
-    $currentDateTime = Carbon::now()->format('d-m-Y');
+    $html = view('reports_template.patient_service_histories', [
+        'imageSrc' => $src,
+        'serviceHistories' => $serviceHistories,
+        'patientName' => $patient->user->full_name
+    ])->render();
 
-    $pdfPath = public_path('Filarca - Rabena_Patients_List_' . $currentDateTime . '.pdf');
+    $patientNameExt = $patient->user->first_name . '_' . $patient->user->last_name;
+    $pdfPath = public_path('FR_' . $patientNameExt . '_service_histories.pdf');
 
-    Browsershot::html($html)->showBackground()->save($pdfPath);
-
-    $pdfPath = public_path('example.pdf'); // Define the path where the PDF will be saved
-    Browsershot::html($html)->save($pdfPath);
+    Browsershot::html($html)
+        ->margins(15.4, 15.4, 15.4, 15.4)
+        ->showBackground()
+        ->save($pdfPath);
 
     // Step 7: Return the generated PDF as a response to be viewed inline in the browser
     return response()->file($pdfPath, [

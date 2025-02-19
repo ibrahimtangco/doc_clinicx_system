@@ -57,10 +57,36 @@
 		<div class="my-8 p-8 bg-white rounded-md">
 			<div class="flex items-center mb-6 justify-between">
 				<h1 class="font-semibold text-lg">Service History</h1>
-				<a href="{{ route('download.patient.service.histories', ['patient' => $patient]) }}">
-					<i class="fa-solid fa-download text-xl mr-4 hover:text-primary cursor-pointer"
+                <form action="{{ route('download.patient.service.histories', ['patient' => $patient]) }}" method="POST"
+                    class="w-full md:w-auto md:flex items-stretch gap-4 space-y-3 md:space-y-0">
+                    @csrf
+                    <div class="flex items-center flex-wrap w-full md:flex-nowrap" date-rangepicker
+                        id="date-range-picker">
+                        <div class="relative flex-1">
+                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                <i class="fa-solid fa-calendar-days text-text-desc"></i>
+                            </div>
+                            <input type="text" id="datepicker-range-start" name="start"
+                                placeholder="Select date start" autocomplete="off"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2">
+                            <x-input-error :messages="$errors->get('start')" class="mt-2" />
+                        </div>
+                        <span class="mx-4 text-gray-500">to</span>
+                        <div class="relative flex-1">
+                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                <i class="fa-solid fa-calendar-days text-text-desc"></i>
+                            </div>
+                            <input type="text" id="datepicker-range-end" name="end" placeholder="Select date end"
+                                autocomplete="off"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2">
+                            <x-input-error :messages="$errors->get('end')" class="mt-2" />
+                        </div>
+                    </div>
+                    <button type="submit" class="w-max px-4 bg-green-600 text-white-text rounded-md hover:bg-green-700">
+                        <i class="fa-solid fa-download text-xl"
 						data-tooltip-target="tooltip-default" type="button"></i>
-				</a>
+                    </button>
+                </form>
 				<div
 					class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-700 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700"
 					id="tooltip-default" role="tooltip">

@@ -12,7 +12,7 @@ $(document).ready(function () {
             },
             success: function (response) {
                 $("#city")
-                    .html('<option value="">--Select City--</option>');
+                    .html('<option value="">Select City</option>');
                 $("#barangay")
                     .empty();
                 // Populate cities dropdown and set selected value if available
@@ -46,7 +46,7 @@ $(document).ready(function () {
             },
             success: function (response) {
                 $("#barangay")
-                    .html('<option value="">--Select Barangay--</option>');
+                    .html('<option value="">Select Barangay</option>');
                 // Populate barangays dropdown and set selected value if available
                 $.each(response.barangay, function (index, value) {
                     $("#barangay").append(

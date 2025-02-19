@@ -1,5 +1,5 @@
 <x-guest-layout :title="$title">
-	<div class="w-full px-6 py-4 lg:max-w-3xl bg-white sm:shadow-md overflow-hidden sm:rounded-lg">
+	<div class="w-full px-6 pb-4 lg:max-w-3xl sm:shadow-md overflow-hidden sm:rounded-lg bg-white">
 		<div class="mb-8 flex justify-between items-center">
 			<h1 class="text-title text-2xl font-semibold">Create Account</h1>
 			<a class="flex items-center pb-2" href="/">
