@@ -131,27 +131,19 @@ php artisan schedule:work
 
 If needed, manually start Laravel with:
 
-```bash
-php artisan serve
-```
+-   run **Apache** and **MySQL** on **XAMPP**.
 
-Then, visit: **http://127.0.0.1:8000**
-
-If using Vite for frontend assets, run:
+-   After that run these command on the terminal:
 
 ```bash
 npm run dev
 ```
 
----
-
-<!-- ## **Authentication Setup**
-Since this project uses **Laravel Breeze**, run the following to install authentication scaffolding:
 ```bash
-php artisan breeze:install
-npm install && npm run dev
-php artisan migrate
-``` -->
+php artisan serve
+```
+
+Then, visit: **http://127.0.0.1:8000**
 
 ---
 
