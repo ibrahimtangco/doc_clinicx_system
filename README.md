@@ -4,12 +4,9 @@
 
 Ensure the target computer has the following installed:
 
--   **PHP 8.2.12 or higher**
+-   **XAMPP with PHP 8.2.12 or higher**
 -   **Composer**
 -   **Node.js & NPM** (for Tailwind CSS and Vite)
--   **MySQL**
--   **Apache** (for running the application)
--   **Git** (optional, for cloning the project)
 
 ---
 
@@ -19,13 +16,13 @@ Ensure the target computer has the following installed:
 
 #### **Option 2: Copy Manually**
 
-Copy the entire project folder to the target computer and navigate to it in the terminal.
+Copy the entire project folder to the target computer and **navigate to it in the terminal**.
 
 ---
 
 ### **2. Install Dependencies**
 
-Run the following command inside the project folder to install PHP dependencies:
+In the terminal, run the following command inside the project folder to install PHP dependencies:
 
 ```bash
 composer install
@@ -45,6 +42,10 @@ npm install
     ```bash
     cp .env.example .env
     ```
+-   Update the app name:
+    ```ini
+    APP_NAME=DocClinicx
+    ```
 -   Update the `.env` file with your database settings:
     ```ini
     DB_CONNECTION=mysql
@@ -52,7 +53,7 @@ npm install
     DB_PORT=3306
     DB_DATABASE=doc_clinicx
     DB_USERNAME=root
-    DB_PASSWORD=your_password
+    DB_PASSWORD=your_passsword || leave it blank if none
     ```
 -   Configure email settings (update credentials if necessary):
     ```ini
@@ -69,6 +70,8 @@ npm install
 ---
 
 ### **4. Generate Application Key**
+
+-   Still in the terminal, run this command:
 
 ```bash
 php artisan key:generate
@@ -124,7 +127,8 @@ php artisan schedule:work
 
 ### **8. Run the Application**
 
-Ensure the Apache server is running.  
+#### Run Apache Server
+
 If needed, manually start Laravel with:
 
 ```bash
