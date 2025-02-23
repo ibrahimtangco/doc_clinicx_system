@@ -87,10 +87,30 @@ php artisan key:generate
 CREATE DATABASE doc_clinicx;
 ```
 
-#### **Run Migrations and Seeders**
+#### **Import Database Schema**
+
+Once the database is created, import the schema using phpMyAdmin:
+
+1. In phpMyAdmin, click on the doc_clinicx database (left panel).
+2. Click on the Import tab at the top.
+3. Click Choose File and navigate to
 
 ```bash
-php artisan migrate --seed
+database/schema/mysql-schema.sql
+```
+
+4. Select the mysql-schema.sql file and click Open.
+5. Click Go to start the import.
+6. Once completed, you should see a success message, confirming that the schema has been imported.
+
+---
+
+#### **Run Seeders**
+
+To seed the users account (Admin, Staff, Dentist, and Patient):
+
+```bash
+php artisan db:seed
 ```
 
 ---
