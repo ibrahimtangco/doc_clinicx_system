@@ -167,7 +167,7 @@ Then, visit: **http://127.0.0.1:8000**
 
 ---
 
-### Login Credentials
+### **9. Login Credentials**
 
 To access user login credentials, open the following file:
 
