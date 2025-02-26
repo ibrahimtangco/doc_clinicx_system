@@ -15,7 +15,7 @@
 			</div>
 
 			{{-- personal info and appointment info container --}}
-			<div class="grid grid-cols-3 gap-6 mt-8">
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
 				{{-- basic info --}}
 				<div class="border border-gray-300 p-6 rounded-lg col-span-1">
 					<h2 class="text-title font-bold">Basic Information</h2>

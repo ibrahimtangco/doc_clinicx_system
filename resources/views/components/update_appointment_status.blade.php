@@ -34,10 +34,7 @@
 						<x-input-label :value="__('Service Name')" for="service-name" />
 						<x-text-input autofocus class="mt-1 w-full service-name" readonly type="text" />
 					</div>
-					<div class="w-full">
-						<x-input-label :value="__('Remarks')" for="remarks" />
-						<x-text-input autofocus class="mt-1 w-full remarks" name="remarks" type="text" />
-					</div>
+
 					<div class="w-full">
 						<x-input-label :value="__('Status')" for="status" />
 						<select
@@ -48,6 +45,11 @@
 							<option value="no_show">No Show</option>
 						</select>
 						<x-input-error :messages="$errors->get('status')" class="mt-2 error-message" />
+					</div>
+
+                    <div class="w-full">
+						<x-input-label :value="__('Remarks/Reason')" for="remarks" />
+                        <textarea class="remarks mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" name="remarks" id=""></textarea>
 					</div>
 
 					<div class="write-prescription hidden gap-2 items-center w-full pt-2">

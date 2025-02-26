@@ -1,7 +1,7 @@
 <x-admin-layout :title="$title">
 	<x-slot name="header">
 		<h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-			<a href="{{ route('providers.index') }}">{{ __('Employee') }}</a>
+			<a href="{{ route('accounts.index') }}">{{ __('Accounts') }}</a>
 		</h2>
 	</x-slot>
 
@@ -13,11 +13,11 @@
 					<section>
 						<header>
 							<h2 class="text-lg font-medium text-gray-900">
-								{{ __('Add Employee') }}
+								{{ __('Add Account') }}
 							</h2>
 
 							<p class="mt-1 text-sm text-gray-600">
-								{{ __('Fill in the required details and credentials to add a new staff to the system.') }}
+								{{ __('Fill in the required details and credentials to add a new account to the system.') }}
 							</p>
 						</header>
 

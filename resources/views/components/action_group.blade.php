@@ -36,7 +36,7 @@
 						class="flex w-full items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('admin.appointments.view') ? 'bg-white/10' : '' }}"
 						href="{{ route('admin.appointments.view') }}">
 						<i class="fa-solid fa-calendar-check"></i>
-						<span>Booked</span>
+						<span>Scheduled</span>
 					</a>
 			</div>
 		</li>
@@ -94,7 +94,7 @@
 		@if (Auth::user()->userType === 'admin')
 			<li @click="isOpenProcedure = !isOpenProcedure" class="">
 				<button
-					class="flex w-full items-center justify-between cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('admin.services') ? 'bg-white/10' : '' }}">
+					class="flex w-full items-center justify-between cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200">
 					<div class="flex gap-2 items-center">
 						<i class="fa-solid fa-tooth"></i>
 
@@ -111,13 +111,13 @@
 					</svg>
 				</button>
 				<div class="pl-6 space-y-1" x-show="isOpenProcedure">
-					<a class="flex w-full items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200"
+					<a class="flex w-full items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('services.index') ? 'bg-white/10' : '' }}"
 						href="{{ route('services.index') }}">
 						<i class="fa-solid fa-eye"></i>
 
 						<span>View Services</span>
 					</a>
-					<a class="flex w-full items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200"
+					<a class="flex w-full items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('services.create') ? 'bg-white/10' : '' }}"
 						href="{{ route('services.create') }}">
 						<i class="fa-solid fa-plus"></i>
 						<span>Add Service</span>
@@ -160,12 +160,12 @@
 					</svg>
 				</button>
 				<div class="pl-6 space-y-1" x-show="isOpenPatient">
-					<a class="flex w-full items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200"
+					<a class="flex w-full items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{request()->routeIs('patients.index') ? 'bg-white/10' : ''}}"
 						href="{{ route('patients.index') }}">
 						<i class="fa-solid fa-eye"></i>
-						<span>View Patient</span>
+						<span>View Patients</span>
 					</a>
-					<a class="flex w-full items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200"
+					<a class="flex w-full items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('patients.create') ? 'bg-white/10' : ''}}"
 						href="{{ route('patients.create') }}">
 						<i class="fa-solid fa-plus"></i>
 						<span>Add Patient</span>
@@ -174,7 +174,7 @@
 			</li>
 		@elseif (Auth::user()->userType === 'staff')
 			<a
-				class="block w-full cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('admin.services') ? 'bg-white/10' : '' }}"
+				class="block w-full cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('patients.index') ? 'bg-white/10' : '' }}"
 				href="{{ route('patients.index') }}">
 				<div class="flex gap-2 items-center">
 					<i class="fa-solid fa-hospital-user"></i>

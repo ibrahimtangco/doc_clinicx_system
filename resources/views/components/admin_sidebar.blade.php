@@ -41,7 +41,7 @@
 				</div>
 			</li>
 			<li
-				class="cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('transactions.index') ? 'bg-white/10' : '' }}">
+				class="cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('transactions.index') || request()->routeIs('transactions.create') ? 'bg-white/10' : '' }}">
 				<div class="flex items-center gap-2">
 					<i class="fa-solid fa-cart-shopping"></i>
 					<a href="{{ route('transactions.index') }}">Sales Transaction</a>
@@ -106,7 +106,7 @@
 						<span>View All Meas.</span>
 					</a>
 					<a
-						class="flex w-full items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('categories.create') ? 'bg-white/10' : '' }}"
+						class="flex w-full items-center gap-2 cursor-pointer hover:bg-white/10 p-2 rounded-sm ease-in-out duration-200 {{ request()->routeIs('unit-types.create') ? 'bg-white/10' : '' }}"
 						href="{{ route('unit-types.create') }}">
 						<i class="fa-solid fa-plus"></i>
 						<span>Add Meas.</span>
